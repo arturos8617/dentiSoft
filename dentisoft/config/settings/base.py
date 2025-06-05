@@ -87,7 +87,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "dentisoft.users",
-    "dentisoft.core",
+    "core",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

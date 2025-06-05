@@ -11,8 +11,8 @@ from django.db.models import ForeignKey
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from dentisoft.core.models import Clinica
-from dentisoft.core.models import Rol
+from core.models import Clinica
+from core.models import Rol
 
 from .managers import UserManager
 
