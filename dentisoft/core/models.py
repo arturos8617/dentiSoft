@@ -1,6 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
 import uuid
+
+from django.conf import settings
+from django.db import models
+
 
 # 1. Rol
 class Rol(models.Model):
@@ -20,16 +22,8 @@ class Clinica(models.Model):
     def __str__(self):
         return self.nombre
 
-# 3. Usuario (extiende AbstractUser para incluir rol y clínica)
-class Usuario(AbstractUser):
-    rol = models.ForeignKey(Rol, on_delete=models.PROTECT)
-    clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
-    activo = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.username  # O si usas email como username, usa self.email
-
-# 4. Paciente
+# 3. Paciente
 class Paciente(models.Model):
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
@@ -41,7 +35,7 @@ class Paciente(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.telefono})"
 
-# 5. EstadoCita
+# 4. EstadoCita
 class EstadoCita(models.Model):
     nombre = models.CharField(max_length=50)
     color = models.CharField(max_length=7)  # Ej. "#FF0000"
@@ -49,19 +43,23 @@ class EstadoCita(models.Model):
     def __str__(self):
         return self.nombre
 
-# 6. Cita
+# 5. Cita
 class Cita(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
     estado = models.ForeignKey(EstadoCita, on_delete=models.PROTECT)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    dentista = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name="citas_dentista")
+    dentista = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="citas_dentista",
+    )
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Cita {self.paciente} con {self.dentista} el {self.fecha} {self.hora}"
 
-# 7. Historial Clínico
+# 6. Historial Clínico
 class HistorialClinico(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     alergias = models.TextField(blank=True)
@@ -74,7 +72,7 @@ class HistorialClinico(models.Model):
     def __str__(self):
         return f"Historial de {self.paciente}"
 
-# 8. EstadoTratamiento
+# 7. EstadoTratamiento
 class EstadoTratamiento(models.Model):
     nombre = models.CharField(max_length=50)
     color = models.CharField(max_length=7)
@@ -82,7 +80,7 @@ class EstadoTratamiento(models.Model):
     def __str__(self):
         return self.nombre
 
-# 9. Tratamiento
+# 8. Tratamiento
 class Tratamiento(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     descripcion = models.TextField()
@@ -93,7 +91,7 @@ class Tratamiento(models.Model):
     def __str__(self):
         return f"{self.descripcion[:20]}... ({self.paciente})"
 
-# 10. Pago
+# 9. Pago
 class Pago(models.Model):
     cita = models.ForeignKey(Cita, on_delete=models.CASCADE)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
@@ -103,14 +101,19 @@ class Pago(models.Model):
     def __str__(self):
         return f"Pago de ${self.monto} - Cita {self.cita.id}"
 
-# 11. InvitacionUsuario
+# 10. InvitacionUsuario
 class InvitacionUsuario(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField()
     token = models.CharField(max_length=255, unique=True)
     rol = models.ForeignKey(Rol, on_delete=models.PROTECT)
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
-    invitado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name="invitaciones_creadas")
+    invitado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="invitaciones_creadas",
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_expiracion = models.DateTimeField()
     ESTADOS = [
