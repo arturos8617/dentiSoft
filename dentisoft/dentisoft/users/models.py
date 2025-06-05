@@ -2,10 +2,17 @@
 from typing import ClassVar
 
 from django.contrib.auth.models import AbstractUser
+from django.db.models import CASCADE
+from django.db.models import PROTECT
+from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import EmailField
+from django.db.models import ForeignKey
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from dentisoft.core.models import Clinica
+from dentisoft.core.models import Rol
 
 from .managers import UserManager
 
@@ -23,6 +30,10 @@ class User(AbstractUser):
     last_name = None  # type: ignore[assignment]
     email = EmailField(_("email address"), unique=True)
     username = None  # type: ignore[assignment]
+
+    rol = ForeignKey(Rol, on_delete=PROTECT, null=True)
+    clinica = ForeignKey(Clinica, on_delete=CASCADE, null=True)
+    activo = BooleanField(default=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
