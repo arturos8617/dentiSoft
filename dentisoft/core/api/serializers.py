@@ -1,12 +1,13 @@
 # core/api/serializers.py
 import uuid
 from datetime import timedelta
+
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import serializers
-from core.models import InvitacionUsuario
-from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from django.contrib.auth import get_user_model
+
+from core.models import InvitacionUsuario
 
 User = get_user_model()
 
@@ -31,14 +32,14 @@ class InvitacionUsuarioSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "fecha_creacion", "estado"]
 
     def create(self, validated_data):
-        # Si no se envió fecha_expiracion, la ponemos a +7 días
+        """Create an ``InvitacionUsuario`` assigning defaults when needed."""
+
         if not validated_data.get("fecha_expiracion"):
             validated_data["fecha_expiracion"] = timezone.now() + timedelta(days=7)
-        # Generar token único
+
         validated_data["token"] = uuid.uuid4().hex
-        invitacion = super().create(validated_data)
         # Aquí podrías disparar un task de Celery para enviar el e-mail
-        return invitacion
+        return super().create(validated_data)
 
 
 class InviteRegisterSerializer(serializers.Serializer):
@@ -53,10 +54,14 @@ class InviteRegisterSerializer(serializers.Serializer):
     def validate_token(self, value):
         try:
             inv = InvitacionUsuario.objects.get(token=value, estado="pendiente")
-        except InvitacionUsuario.DoesNotExist:
-            raise ValidationError("Token inválido o ya usado/expirado.")
+        except InvitacionUsuario.DoesNotExist as exc:
+            msg = "Token inválido o ya usado/expirado."
+            raise ValidationError(msg) from exc
+
         if inv.fecha_expiracion < timezone.now():
-            raise ValidationError("La invitación ha expirado.")
+            msg = "La invitación ha expirado."
+            raise ValidationError(msg)
+
         return inv
 
     def create(self, validated_data):
