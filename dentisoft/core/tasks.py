@@ -1,17 +1,21 @@
 from celery import shared_task
-from django.core.mail import send_mail
-from django.urls import reverse
 
-from core.models import InvitacionUsuario
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 
 @shared_task()
-def enviar_invitacion_email(invitacion_id: str) -> None:
-    invitacion = InvitacionUsuario.objects.get(id=invitacion_id)
-    subject = "Invitación a DentiSoft"
-    mensaje = (
-        "Has sido invitado a unirte a DentiSoft. "
-        f"Utiliza este token para registrarte: {invitacion.token}"
+def send_test_email(recipient: str) -> bool:
+    """Send a test email with plain text and HTML versions."""
+    context = {"domain": settings.SITE_DOMAIN}
+    text_body = render_to_string("email/test_email.txt", context)
+    html_body = render_to_string("email/test_email.html", context)
+    message = EmailMultiAlternatives(
+        subject="Test Email", body=text_body, to=[recipient],
     )
-    send_mail(subject, mensaje, None, [invitacion.email])
+    message.attach_alternative(html_body, "text/html")
+    message.send()
+    return True
+
 

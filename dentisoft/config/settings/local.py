@@ -15,6 +15,7 @@ SECRET_KEY = env(
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
+SITE_DOMAIN = env("DJANGO_SITE_DOMAIN", default="localhost:8000")
 
 # CACHES
 # ------------------------------------------------------------------------------
