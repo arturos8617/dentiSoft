@@ -11,7 +11,10 @@ def send_test_email(recipient: str) -> bool:
     text_body = render_to_string("email/test_email.txt", context)
     html_body = render_to_string("email/test_email.html", context)
     message = EmailMultiAlternatives(
-        subject="Test Email", body=text_body, to=[recipient],
+        subject="Test Email",
+        body=text_body,
+        to=[recipient],
+        from_email=settings.DEFAULT_FROM_EMAIL,
     )
     message.attach_alternative(html_body, "text/html")
     message.send()

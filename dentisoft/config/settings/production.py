@@ -118,7 +118,7 @@ MEDIA_URL = f"https://{aws_s3_domain}/media/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
     "DJANGO_DEFAULT_FROM_EMAIL",
-    default="DentiSoft <noreply@dentisoft.com>",
+    default=DEFAULT_FROM_EMAIL,
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
