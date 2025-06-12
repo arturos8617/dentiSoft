@@ -1,4 +1,5 @@
 from celery import shared_task
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -16,4 +17,5 @@ def send_test_email(recipient: str) -> bool:
     message.attach_alternative(html_body, "text/html")
     message.send()
     return True
+
 
