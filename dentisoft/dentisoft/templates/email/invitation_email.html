@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>{% translate "You have been invited to join" %} <strong>{{ domain }}</strong>.</p>
+<p>{% translate "Use the following link to accept the invitation" %}:</p>
+<p><a href="{{ invitation_url }}">{{ invitation_url }}</a></p>
+<p>{% translate "This invitation expires on" %} {{ expiration_date }}.</p>

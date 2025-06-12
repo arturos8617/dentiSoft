@@ -1,0 +1,5 @@
+{% load i18n %}
+{% translate "You have been invited to join" %} {{ domain }}.
+{% translate "Use the following link to accept the invitation" %}:
+{{ invitation_url }}
+{% translate "This invitation expires on" %} {{ expiration_date }}.
