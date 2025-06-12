@@ -56,6 +56,16 @@ cd dentisoft
 celery -A config.celery_app worker -l info
 ```
 
+Once the worker is running you can trigger tasks from the shell:
+
+```python
+from core.tasks import send_test_email
+send_test_email.delay("user@example.com")
+```
+
+This task sends both the text and HTML email templates stored in
+`dentisoft/templates/email/`.
+
 Please note: For Celery's import magic to work, it is important _where_ the celery commands are run. If you are in the same folder with _manage.py_, you should be right.
 
 To run [periodic tasks](https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html), you'll need to start the celery beat scheduler service. You can start it as a standalone process:
