@@ -30,7 +30,9 @@ class InvitacionUsuarioSerializer(serializers.ModelSerializer):
             "estado",
         ]
         read_only_fields = ["id", "fecha_creacion", "estado"]
-
+        extra_kwargs = {
+            "fecha_expiracion": {"required": False},
+        }
     def create(self, validated_data):
         """Create an ``InvitacionUsuario`` assigning defaults when needed."""
 
