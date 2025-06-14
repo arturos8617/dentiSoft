@@ -105,3 +105,9 @@ The following details how to deploy this application.
 ### Docker
 
 See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
+
+## Frontend
+- Folder: `frontend/`
+- Run in dev: `cd frontend && npm run dev`
+- Environment: copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL`
+
