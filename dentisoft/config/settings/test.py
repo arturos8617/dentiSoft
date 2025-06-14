@@ -5,6 +5,7 @@ With these settings, tests run faster.
 from .base import *  # noqa: F403
 from .base import TEMPLATES
 from .base import env
+import tempfile
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -37,5 +38,9 @@ TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore[index]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = "http://media.testserver/"
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+STATIC_ROOT = tempfile.mkdtemp(prefix="staticfiles_")
+
 # Your stuff...
 # ------------------------------------------------------------------------------
