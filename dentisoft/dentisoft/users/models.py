@@ -1,50 +1,59 @@
-
 from typing import ClassVar
-
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CASCADE
-from django.db.models import PROTECT
-from django.db.models import BooleanField
-from django.db.models import CharField
-from django.db.models import EmailField
-from django.db.models import ForeignKey
-from django.urls import reverse
+from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
-from core.models import Clinica
-from core.models import Rol
-
+from core.models import Clinica, Rol
 from .managers import UserManager
 
 
 class User(AbstractUser):
     """
-    Default custom user model for DentiSoft.
-    If adding fields that need to be filled at user signup,
-    check forms.SignupForm and forms.SocialSignupForms accordingly.
+    Modelo de usuario personalizado para DentiSoft,
+    con campos obligatorios: first_name, last_name, telefono, fecha_nacimiento.
     """
 
-    # First and last name do not cover name patterns around the globe
-    name = CharField(_("Name of User"), blank=True, max_length=255)
-    first_name = None  # type: ignore[assignment]
-    last_name = None  # type: ignore[assignment]
-    email = EmailField(_("email address"), unique=True)
-    username = None  # type: ignore[assignment]
+    # Override default username fields
+    username = None
+    email = models.EmailField(_("email address"), unique=True)
 
-    rol = ForeignKey(Rol, on_delete=PROTECT, null=True)
-    clinica = ForeignKey(Clinica, on_delete=CASCADE, null=True)
-    activo = BooleanField(default=True)
+    # Datos personales obligatorios
+    first_name = models.CharField(_("Nombre"), max_length=30)
+    last_name = models.CharField(_("Apellidos"), max_length=150)
+    telefono = models.CharField(_("Teléfono"), max_length=20)
+    fecha_nacimiento = models.DateField(_("Fecha de nacimiento"))
 
+    # Opcional / adicionales
+    avatar = models.ImageField(
+        _("Foto de perfil"),
+        upload_to="avatars/",
+        blank=True,
+        null=True,
+        default="avatars/default-avatar.jpg",
+    )
+    genero = models.CharField(
+        _("Género"),
+        max_length=10,
+        choices=[
+            ("M", "Masculino"),
+            ("F", "Femenino"),
+            ("O", "Otro"),
+            ("N", "Prefiero no decir"),
+        ],
+        blank=True,
+    )
+
+    # Relación con tu dominio
+    rol = models.ForeignKey(Rol, on_delete=models.PROTECT)
+    clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
+    activo = models.BooleanField(_("Activo"), default=True)
+
+    # Autenticación
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["first_name", "last_name", "telefono", "fecha_nacimiento"]
 
     objects: ClassVar[UserManager] = UserManager()
 
     def get_absolute_url(self) -> str:
-        """Get URL for user's detail view.
-
-        Returns:
-            str: URL for user detail.
-
-        """
         return reverse("users:detail", kwargs={"pk": self.id})
