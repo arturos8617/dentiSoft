@@ -41,7 +41,8 @@ class User(AbstractUser):
             ("O", "Otro"),
             ("N", "Prefiero no decir"),
         ],
-        blank=True,
+        blank=False,
+        null=False
     )
 
     # Relación con tu dominio
@@ -51,7 +52,7 @@ class User(AbstractUser):
 
     # Autenticación
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "telefono", "fecha_nacimiento"]
+    REQUIRED_FIELDS = ["first_name", "last_name", "telefono", "fecha_nacimiento","genero"]
 
     objects: ClassVar[UserManager] = UserManager()
 
