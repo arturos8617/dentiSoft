@@ -58,7 +58,7 @@ class InvitacionUsuarioSerializer(serializers.ModelSerializer):
             raise ValidationError({"clinica": "Clínica inválida"}) from exc
 
         attrs["rol"] = rol
-        attrs["clinica"] = clinica        
+        attrs["clinica"] = clinica
         email = attrs.get("email")
         if (
             email
@@ -94,7 +94,8 @@ class InviteRegisterSerializer(serializers.Serializer):
     Serializer para registrar un User a partir de un token de invitación.
     """
     token = serializers.CharField()
-    name = serializers.CharField(max_length=255)
+    first_name = serializers.CharField(max_length=30)
+    last_name = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
@@ -117,7 +118,8 @@ class InviteRegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(
             email=validated_data["email"],
             password=validated_data["password"],
-            name=validated_data["name"],
+            first_name=validated_data["first_name"],
+            last_name=validated_data["last_name"],
             rol=inv.rol,
             clinica=inv.clinica,
         )

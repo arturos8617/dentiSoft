@@ -59,7 +59,8 @@ def test_invite_register_creates_user(client):
     )
     data = {
         "token": invitacion.token,
-        "name": "New User",
+        "first_name": "New",
+        "last_name": "User",
         "email": invitacion.email,
         "password": "pass1234",
     }
@@ -78,7 +79,8 @@ def test_invite_register_creates_user(client):
 def test_invite_register_invalid_token(client):
     data = {
         "token": "invalid",
-        "name": "Bad",
+        "first_name": "Bad",
+        "last_name": "Guy",
         "email": "bad@example.com",
         "password": "pass",
     }
@@ -173,3 +175,45 @@ def test_non_cca_invites_cca(client):
 
     assert response.status_code == 400
     assert "rol" in response.json()
+
+def test_invite_existing_active_user(client):
+    """Creating invitation for an existing active user should fail."""
+    rol, clinica = create_clinica_and_rol()
+    inviter = create_user_with_role_clinic(rol, clinica)
+    active_user = create_user_with_role_clinic(rol, clinica)
+    client.force_login(inviter)
+
+    url = reverse("api:invitacionusuario-list")
+    response = client.post(
+        url,
+        {"email": active_user.email, "rol": rol.id, "clinica": clinica.id},
+    )
+
+    assert response.status_code == 400
+    assert "email" in response.json()
+
+
+def test_invite_duplicate_pending(client):
+    """Submitting a second pending invitation for same email and clinic fails."""
+    rol, clinica = create_clinica_and_rol()
+    inviter = create_user_with_role_clinic(rol, clinica)
+    client.force_login(inviter)
+
+    InvitacionUsuario.objects.create(
+        email="pending@example.com",
+        token="tok123",
+        rol=rol,
+        clinica=clinica,
+        invitado_por=inviter,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+
+    url = reverse("api:invitacionusuario-list")
+    response = client.post(
+        url,
+        {"email": "pending@example.com", "rol": rol.id, "clinica": clinica.id},
+    )
+
+    assert response.status_code == 400
+    assert "non_field_errors" in response.json()
+
