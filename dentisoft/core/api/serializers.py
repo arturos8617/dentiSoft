@@ -33,6 +33,27 @@ class InvitacionUsuarioSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "fecha_expiracion": {"required": False},
         }
+
+    def validate_email(self, value):
+        """Ensure there isn't already an active user with this email."""
+        if User.objects.filter(email=value, activo=True).exists():
+            raise ValidationError("Este correo ya está registrado")
+        return value
+
+    def validate(self, attrs):
+        """Check for existing pending invitations for the same email and clinic."""
+        email = attrs.get("email")
+        clinica = attrs.get("clinica")
+        if (
+            email
+            and clinica
+            and InvitacionUsuario.objects.filter(
+                email=email, clinica=clinica, estado="pendiente"
+            ).exists()
+        ):
+            raise ValidationError("Ya existe una invitación pendiente para este correo")
+        return attrs
+
     def create(self, validated_data):
         """Create an ``InvitacionUsuario`` assigning defaults when needed."""
 

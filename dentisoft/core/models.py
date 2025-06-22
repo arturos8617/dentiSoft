@@ -115,6 +115,7 @@ class InvitacionUsuario(models.Model):
         related_name="invitaciones_creadas",
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    ip_creacion = models.GenericIPAddressField(null=True, blank=True)
     fecha_expiracion = models.DateTimeField()
     ESTADOS = [
         ("pendiente", "Pendiente"),
