@@ -1,4 +1,5 @@
 import pytest
+import logging
 from django.urls import reverse
 from django.utils import timezone
 
@@ -43,6 +44,8 @@ def test_create_invitation_enqueues_task(client, user, monkeypatch):
     invitation_id = response.json()["id"]
     assert called["id"] == invitation_id
     assert InvitacionUsuario.objects.filter(id=invitation_id).exists()
+    invitation = InvitacionUsuario.objects.get(id=invitation_id)
+    assert invitation.ip_creacion == "127.0.0.1"
 
 
 def test_invite_register_creates_user(client):
@@ -85,3 +88,88 @@ def test_invite_register_invalid_token(client):
     assert response.status_code == 400
     assert "token" in response.json()
     assert not User.objects.filter(email="bad@example.com").exists()
+
+
+
+def test_create_invitation_logs(client, user, caplog):
+    client.force_login(user)
+    rol, clinica = create_clinica_and_rol()
+    url = reverse("api:invitacionusuario-list")
+
+    with caplog.at_level(logging.INFO, logger="core.api.views"):
+        client.post(
+            url,
+            {
+                "email": "log@example.com",
+                "rol": rol.id,
+                "clinica": clinica.id,
+            },
+        )
+
+    assert any("log@example.com" in record.getMessage() for record in caplog.records)
+
+
+def create_user_with_role_clinic(rol, clinica):
+    return User.objects.create_user(
+        email="user@example.com",
+        password="pass",
+        first_name="John",
+        last_name="Doe",
+        telefono="123",
+        fecha_nacimiento=timezone.now().date(),
+        genero="M",
+        rol=rol,
+        clinica=clinica,
+    )
+
+
+def test_invite_with_nonexistent_role(client):
+    rol, clinica = create_clinica_and_rol()
+    user = create_user_with_role_clinic(rol, clinica)
+    client.force_login(user)
+
+    url = reverse("api:invitacionusuario-list")
+    response = client.post(
+        url,
+        {"email": "a@b.com", "rol": 9999, "clinica": clinica.id},
+    )
+
+    assert response.status_code == 400
+    assert "rol" in response.json()
+
+
+def test_invite_to_other_clinic(client):
+    rol, clinica = create_clinica_and_rol()
+    other_clinic = Clinica.objects.create(
+        nombre="Otra", direccion="Dir", telefono="123", email="o@example.com"
+    )
+    user = create_user_with_role_clinic(rol, clinica)
+    client.force_login(user)
+
+    url = reverse("api:invitacionusuario-list")
+    response = client.post(
+        url,
+        {"email": "a@b.com", "rol": rol.id, "clinica": other_clinic.id},
+    )
+
+    assert response.status_code == 400
+    assert "clinica" in response.json()
+
+
+def test_non_cca_invites_cca(client):
+    rol_user = Rol.objects.create(nombre="dentista", descripcion="")
+    rol_cca = Rol.objects.create(nombre="CCA", descripcion="")
+    clinica = Clinica.objects.create(
+        nombre="Clinica1", direccion="Dir", telefono="123", email="c1@example.com"
+    )
+    user = create_user_with_role_clinic(rol_user, clinica)
+    client.force_login(user)
+
+    url = reverse("api:invitacionusuario-list")
+    response = client.post(
+        url,
+        {"email": "a@b.com", "rol": rol_cca.id, "clinica": clinica.id},
+    )
+
+    assert response.status_code == 400
+    assert "rol" in response.json()

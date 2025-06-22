@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from core.models import InvitacionUsuario
+from core.models import InvitacionUsuario, Clinica, Rol
 
 User = get_user_model()
 
@@ -41,17 +41,41 @@ class InvitacionUsuarioSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        """Check for existing pending invitations for the same email and clinic."""
+        """Additional validation for invitations."""
+        request = self.context.get("request")
+
+        rol_id = self.initial_data.get("rol")
+        clinica_id = self.initial_data.get("clinica")
+
+        try:
+            rol = Rol.objects.get(pk=rol_id)
+        except Rol.DoesNotExist as exc:  # noqa: B904
+            raise ValidationError({"rol": "Rol inválido"}) from exc
+
+        try:
+            clinica = Clinica.objects.get(pk=clinica_id)
+        except Clinica.DoesNotExist as exc:  # noqa: B904
+            raise ValidationError({"clinica": "Clínica inválida"}) from exc
+
+        attrs["rol"] = rol
+        attrs["clinica"] = clinica        
         email = attrs.get("email")
-        clinica = attrs.get("clinica")
         if (
             email
-            and clinica
             and InvitacionUsuario.objects.filter(
                 email=email, clinica=clinica, estado="pendiente"
             ).exists()
         ):
             raise ValidationError("Ya existe una invitación pendiente para este correo")
+        
+        if request:
+            if getattr(request.user, "clinica_id", None) != clinica.id:
+                raise ValidationError({"clinica": "Clínica inválida para este usuario"})
+
+            rol_nombre = getattr(getattr(request.user, "rol", None), "nombre", None)
+            if rol.nombre == "CCA" and rol_nombre != "CCA":
+                raise ValidationError({"rol": "No puede asignar el rol CCA"})
+
         return attrs
 
     def create(self, validated_data):

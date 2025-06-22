@@ -1,3 +1,4 @@
+import logging
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,6 +9,8 @@ from core.api.serializers import InvitacionUsuarioSerializer, InviteRegisterSeri
 from core.api.permissions import CanInvitePermission
 from core.models import InvitacionUsuario
 from core.tasks import enviar_invitacion_email
+
+logger = logging.getLogger(__name__)
 
 class InvitacionUsuarioViewSet(viewsets.ModelViewSet):
     queryset = InvitacionUsuario.objects.all()
@@ -22,6 +25,14 @@ class InvitacionUsuarioViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         invitacion = serializer.save()
+        logger.info(
+            "Invitation created: inviter=%s invitee=%s role=%s clinic=%s ip=%s",
+            request.user.id,
+            invitacion.email,
+            invitacion.rol_id,
+            invitacion.clinica_id,
+            invitacion.ip_creacion,
+        )
         enviar_invitacion_email.delay(invitacion.id)
         headers = self.get_success_headers(serializer.data)
         return Response(
