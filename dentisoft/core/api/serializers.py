@@ -98,7 +98,9 @@ class InviteRegisterSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-
+    telefono = serializers.CharField(max_length=20)
+    fecha_nacimiento = serializers.DateField()
+    genero = serializers.ChoiceField(choices=User._meta.get_field("genero").choices)
     def validate_token(self, value):
         try:
             inv = InvitacionUsuario.objects.get(token=value, estado="pendiente")
@@ -120,6 +122,9 @@ class InviteRegisterSerializer(serializers.Serializer):
             password=validated_data["password"],
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
+            telefono=validated_data["telefono"],
+            fecha_nacimiento=validated_data["fecha_nacimiento"],
+            genero=validated_data["genero"],
             rol=inv.rol,
             clinica=inv.clinica,
         )

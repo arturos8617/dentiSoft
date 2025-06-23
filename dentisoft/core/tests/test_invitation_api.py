@@ -1,16 +1,19 @@
 import pytest
 import logging
+import uuid
 from django.urls import reverse
 from django.utils import timezone
 
 from core.models import Clinica, Rol, InvitacionUsuario
 from dentisoft.users.models import User
+from core.api.permissions import CanInvitePermission
 
 pytestmark = pytest.mark.django_db
 
 
 def create_clinica_and_rol():
-    rol = Rol.objects.create(nombre="Rol", descripcion="")
+    role_name = CanInvitePermission.authorized_roles[0]
+    rol, _ = Rol.objects.get_or_create(nombre=role_name, defaults={"descripcion": ""})
     clinica = Clinica.objects.create(
         nombre="Clinica",
         direccion="Dir",
@@ -21,8 +24,11 @@ def create_clinica_and_rol():
 
 
 def test_create_invitation_enqueues_task(client, user, monkeypatch):
-    client.force_login(user)
     rol, clinica = create_clinica_and_rol()
+    user.clinica = clinica
+    user.rol = rol
+    user.save()
+    client.force_login(user)
     called = {}
 
     def fake_delay(inv_id):
@@ -63,6 +69,9 @@ def test_invite_register_creates_user(client):
         "last_name": "User",
         "email": invitacion.email,
         "password": "pass1234",
+        "telefono": "1234567",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
     }
     url = reverse("invite-register")
     response = client.post(url, data)
@@ -83,6 +92,9 @@ def test_invite_register_invalid_token(client):
         "last_name": "Guy",
         "email": "bad@example.com",
         "password": "pass",
+        "telefono": "1234567",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
     }
     url = reverse("invite-register")
     response = client.post(url, data)
@@ -94,8 +106,11 @@ def test_invite_register_invalid_token(client):
 
 
 def test_create_invitation_logs(client, user, caplog):
-    client.force_login(user)
     rol, clinica = create_clinica_and_rol()
+    user.clinica = clinica
+    user.rol = rol
+    user.save()
+    client.force_login(user)
     url = reverse("api:invitacionusuario-list")
 
     with caplog.at_level(logging.INFO, logger="core.api.views"):
@@ -111,9 +126,11 @@ def test_create_invitation_logs(client, user, caplog):
     assert any("log@example.com" in record.getMessage() for record in caplog.records)
 
 
-def create_user_with_role_clinic(rol, clinica):
+def create_user_with_role_clinic(rol, clinica, *, email=None):
+    if email is None:
+        email = f"user-{uuid.uuid4()}@example.com"
     return User.objects.create_user(
-        email="user@example.com",
+        email=email,
         password="pass",
         first_name="John",
         last_name="Doe",
@@ -127,7 +144,7 @@ def create_user_with_role_clinic(rol, clinica):
 
 def test_invite_with_nonexistent_role(client):
     rol, clinica = create_clinica_and_rol()
-    user = create_user_with_role_clinic(rol, clinica)
+    user = create_user_with_role_clinic(rol, clinica, email="user1@example.com")
     client.force_login(user)
 
     url = reverse("api:invitacionusuario-list")
@@ -145,7 +162,7 @@ def test_invite_to_other_clinic(client):
     other_clinic = Clinica.objects.create(
         nombre="Otra", direccion="Dir", telefono="123", email="o@example.com"
     )
-    user = create_user_with_role_clinic(rol, clinica)
+    user = create_user_with_role_clinic(rol, clinica, email="user2@example.com")
     client.force_login(user)
 
     url = reverse("api:invitacionusuario-list")
@@ -160,11 +177,11 @@ def test_invite_to_other_clinic(client):
 
 def test_non_cca_invites_cca(client):
     rol_user = Rol.objects.create(nombre="dentista", descripcion="")
-    rol_cca = Rol.objects.create(nombre="CCA", descripcion="")
+    rol_cca, _ = Rol.objects.get_or_create(nombre="CCA", defaults={"descripcion": ""})
     clinica = Clinica.objects.create(
         nombre="Clinica1", direccion="Dir", telefono="123", email="c1@example.com"
     )
-    user = create_user_with_role_clinic(rol_user, clinica)
+    user = create_user_with_role_clinic(rol_user, clinica, email="user3@example.com")
     client.force_login(user)
 
     url = reverse("api:invitacionusuario-list")
@@ -179,7 +196,8 @@ def test_non_cca_invites_cca(client):
 def test_invite_existing_active_user(client):
     """Creating invitation for an existing active user should fail."""
     rol, clinica = create_clinica_and_rol()
-    inviter = create_user_with_role_clinic(rol, clinica)
+    inviter = create_user_with_role_clinic(rol, clinica, email="user4@example.com")
+    active_user = create_user_with_role_clinic(rol, clinica, email="user5@example.com")
     active_user = create_user_with_role_clinic(rol, clinica)
     client.force_login(inviter)
 
@@ -196,7 +214,7 @@ def test_invite_existing_active_user(client):
 def test_invite_duplicate_pending(client):
     """Submitting a second pending invitation for same email and clinic fails."""
     rol, clinica = create_clinica_and_rol()
-    inviter = create_user_with_role_clinic(rol, clinica)
+    inviter = create_user_with_role_clinic(rol, clinica, email="user6@example.com")
     client.force_login(inviter)
 
     InvitacionUsuario.objects.create(
