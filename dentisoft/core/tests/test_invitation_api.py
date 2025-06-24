@@ -327,7 +327,6 @@ def test_invite_existing_active_user(client):
     rol, clinica = create_clinica_and_rol()
     inviter = create_user_with_role_clinic(rol, clinica, email="user4@example.com")
     active_user = create_user_with_role_clinic(rol, clinica, email="user5@example.com")
-    active_user = create_user_with_role_clinic(rol, clinica)
     client.force_login(inviter)
 
     url = reverse("api:invitacionusuario-list")

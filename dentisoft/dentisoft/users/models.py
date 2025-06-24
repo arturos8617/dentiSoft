@@ -1,10 +1,13 @@
 from typing import ClassVar
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from core.models import Clinica, Rol
+
+from core.models import Clinica
+from core.models import Rol
 from .managers import UserManager
 
 
@@ -42,7 +45,7 @@ class User(AbstractUser):
             ("N", "Prefiero no decir"),
         ],
         blank=False,
-        null=False
+        null=False,
     )
 
     # Relación con tu dominio
@@ -52,9 +55,19 @@ class User(AbstractUser):
 
     # Autenticación
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "telefono", "fecha_nacimiento","genero"]
-
+    REQUIRED_FIELDS = [
+        "first_name",
+        "last_name",
+        "telefono",
+        "fecha_nacimiento",
+        "genero",
+    ]
     objects: ClassVar[UserManager] = UserManager()
 
     def get_absolute_url(self) -> str:
         return reverse("users:detail", kwargs={"pk": self.id})
+
+    @property
+    def name(self) -> str:
+        """Return the user's full name."""
+        return f"{self.first_name} {self.last_name}"
