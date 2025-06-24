@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from factory import Faker, SubFactory
+from factory import Faker, SubFactory, LazyFunction
 from factory import post_generation
 from factory.django import DjangoModelFactory
 from core.models import Clinica, Rol
@@ -16,10 +16,15 @@ class RolFactory(DjangoModelFactory[Rol]):
         django_get_or_create = ["nombre"]
 
 
+def _short_phone() -> str:
+    """Generate a phone number trimmed to the DB field length."""
+    return Faker("phone_number").generate({})[:20]
+
+
 class ClinicaFactory(DjangoModelFactory[Clinica]):
     nombre = Faker("company")
     direccion = Faker("street_address")
-    telefono = Faker("phone_number")
+    telefono = LazyFunction(_short_phone)
     email = Faker("company_email")
 
     class Meta:
@@ -32,7 +37,7 @@ class UserFactory(DjangoModelFactory[User]):
     email = Faker("email")
     first_name = Faker("first_name")
     last_name = Faker("last_name")
-    telefono = Faker("phone_number")
+    telefono = LazyFunction(_short_phone)
     fecha_nacimiento = Faker("date_of_birth")
     genero = Faker("random_element", elements=["M", "F", "O", "N"])
     rol = SubFactory(RolFactory)
