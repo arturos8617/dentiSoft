@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.core.exceptions import ImproperlyConfigured
-from core.models import Rol, Clinica
 
+from core.models import Clinica
+from core.models import Rol
 
 if TYPE_CHECKING:
     from .models import User  # noqa: F401

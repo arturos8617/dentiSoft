@@ -1,14 +1,16 @@
 from allauth.account.decorators import secure_admin_login
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.utils.translation import gettext_lazy as _
-from django import forms
 
+from core.models import Clinica
+from core.models import Rol
+
+from .forms import UserAdminChangeForm
+from .forms import UserAdminCreationForm
 from .models import User
-from .forms import UserAdminChangeForm, UserAdminCreationForm
-from core.models import Rol, Clinica
-
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     admin.autodiscover()
@@ -44,7 +46,7 @@ class CustomUserCreationForm(UserAdminCreationForm):
     telefono = forms.CharField(required=True, max_length=20)
     fecha_nacimiento = forms.DateField(
         required=True,
-        widget=forms.DateInput(attrs={"type": "date"})
+        widget=forms.DateInput(attrs={"type": "date"}),
     )
     genero = forms.ChoiceField(
         choices=User._meta.get_field("genero").choices,
@@ -92,7 +94,7 @@ class UserAdmin(auth_admin.UserAdmin):
                 "avatar",
                 "fecha_nacimiento",
                 "genero",
-            )
+            ),
         }),
         (_("Permisos"), {
             "fields": (
@@ -101,10 +103,10 @@ class UserAdmin(auth_admin.UserAdmin):
                 "is_superuser",
                 "groups",
                 "user_permissions",
-            )
+            ),
         }),
         (_("Información personalizada"), {
-            "fields": ("rol", "clinica", "activo")
+            "fields": ("rol", "clinica", "activo"),
         }),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
