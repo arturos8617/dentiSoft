@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from factory import Faker, SubFactory
+from factory import Faker as FactoryFaker, SubFactory, LazyFunction
 from factory import post_generation
 from factory.django import DjangoModelFactory
 from core.models import Clinica, Rol
@@ -9,18 +9,23 @@ from dentisoft.users.models import User
 
 class RolFactory(DjangoModelFactory[Rol]):
     nombre = "dentista"
-    descripcion = Faker("sentence")
+    descripcion = FactoryFaker("sentence")
 
     class Meta:
         model = Rol
         django_get_or_create = ["nombre"]
 
 
+def _short_phone() -> str:
+    """Generate a phone number trimmed to the DB field length."""
+    return FactoryFaker("phone_number").evaluate(None, None, extra={"locale": None})[:20]
+
+
 class ClinicaFactory(DjangoModelFactory[Clinica]):
-    nombre = Faker("company")
-    direccion = Faker("street_address")
-    telefono = Faker("phone_number")
-    email = Faker("company_email")
+    nombre = FactoryFaker("company")
+    direccion = FactoryFaker("street_address")
+    telefono = LazyFunction(_short_phone)
+    email = FactoryFaker("company_email")
 
     class Meta:
         model = Clinica
@@ -29,12 +34,12 @@ class ClinicaFactory(DjangoModelFactory[Clinica]):
 
 
 class UserFactory(DjangoModelFactory[User]):
-    email = Faker("email")
-    first_name = Faker("first_name")
-    last_name = Faker("last_name")
-    telefono = Faker("phone_number")
-    fecha_nacimiento = Faker("date_of_birth")
-    genero = Faker("random_element", elements=["M", "F", "O", "N"])
+    email = FactoryFaker("email")
+    first_name = FactoryFaker("first_name")
+    last_name = FactoryFaker("last_name")
+    telefono = LazyFunction(_short_phone)
+    fecha_nacimiento = FactoryFaker("date_of_birth")
+    genero = FactoryFaker("random_element", elements=["M", "F", "O", "N"])
     rol = SubFactory(RolFactory)
     clinica = SubFactory(ClinicaFactory)
 
@@ -43,7 +48,7 @@ class UserFactory(DjangoModelFactory[User]):
         password = (
             extracted
             if extracted
-            else Faker(
+            else FactoryFaker(
                 "password",
                 length=42,
                 special_chars=True,
