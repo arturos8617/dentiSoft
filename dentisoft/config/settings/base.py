@@ -361,5 +361,8 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SCHEMA_PATH_PREFIX": "/api/",
 }
+# Additional custom settings
+RECAPTCHA_REQUIRED = env.bool("DJANGO_RECAPTCHA_REQUIRED", default=False)
+RECAPTCHA_SECRET_KEY = env("DJANGO_RECAPTCHA_SECRET_KEY", default="")
 # Your stuff...
 # ------------------------------------------------------------------------------
