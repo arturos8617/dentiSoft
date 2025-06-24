@@ -22,12 +22,13 @@ class InvitacionUsuarioViewSet(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        data["invitado_por"] = request.user.pk
-        data["ip_creacion"] = request.META.get("REMOTE_ADDR")
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        invitacion = serializer.save()
+        invitacion = serializer.save(
+            invitado_por=request.user,
+            ip_creacion=request.META.get("REMOTE_ADDR"),
+        )
+        
         logger.info(
             "Invitation created: inviter=%s invitee=%s role=%s clinic=%s ip=%s",
             request.user.id,

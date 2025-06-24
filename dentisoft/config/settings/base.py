@@ -269,7 +269,7 @@ LOGGING = {
         "core.api": {
             "level": "INFO",
             "handlers": ["console"],
-            "propagate": False,
+            "propagate": True,
         },
     },
 }
