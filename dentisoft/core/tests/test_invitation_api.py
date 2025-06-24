@@ -1,12 +1,15 @@
-import pytest
 import logging
 import uuid
+
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from core.models import Clinica, Rol, InvitacionUsuario
-from dentisoft.users.models import User
 from core.api.permissions import CanInvitePermission
+from core.models import Clinica
+from core.models import InvitacionUsuario
+from core.models import Rol
+from dentisoft.users.models import User
 
 pytestmark = pytest.mark.django_db
 
@@ -68,7 +71,8 @@ def test_invite_register_creates_user(client):
         "first_name": "New",
         "last_name": "User",
         "email": invitacion.email,
-        "password": "pass1234",
+        "password1": "Pass1234",
+        "password2": "Pass1234",
         "telefono": "1234567",
         "fecha_nacimiento": timezone.now().date(),
         "genero": "M",
@@ -85,13 +89,138 @@ def test_invite_register_creates_user(client):
     assert user.clinica == clinica
 
 
+def test_invite_register_email_mismatch(client):
+    """Registration fails if provided email doesn't match invitation."""
+    rol, clinica = create_clinica_and_rol()
+    invitacion = InvitacionUsuario.objects.create(
+        email="new2@example.com",
+        token="token456",
+        rol=rol,
+        clinica=clinica,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+    data = {
+        "token": invitacion.token,
+        "first_name": "New",
+        "last_name": "User",
+        "email": "wrong@example.com",
+        "password1": "Pass1234",
+        "password2": "Pass1234",
+        "telefono": "1111",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
+    }
+    url = reverse("invite-register")
+    response = client.post(url, data)
+
+    assert response.status_code == 400
+    assert "email" in response.json()
+
+
+def test_invite_register_unique_phone(client):
+    """Registration fails if phone already exists."""
+    rol, clinica = create_clinica_and_rol()
+    InvitacionUsuario.objects.create(
+        email="dup@example.com",
+        token="token789",
+        rol=rol,
+        clinica=clinica,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+    User.objects.create_user(
+        email="other@example.com",
+        password="pass",
+        first_name="A",
+        last_name="B",
+        telefono="9999",
+        fecha_nacimiento=timezone.now().date(),
+        genero="M",
+        rol=rol,
+        clinica=clinica,
+    )
+    data = {
+        "token": "token789",
+        "first_name": "Foo",
+        "last_name": "Bar",
+        "email": "dup@example.com",
+        "password1": "Pass1234",
+        "password2": "Pass1234",
+        "telefono": "9999",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
+    }
+    url = reverse("invite-register")
+    response = client.post(url, data)
+
+    assert response.status_code == 400
+    assert "telefono" in response.json()
+
+
+def test_invite_register_password_policy(client):
+    rol, clinica = create_clinica_and_rol()
+    invitacion = InvitacionUsuario.objects.create(
+        email="policy@example.com",
+        token="tokpol",
+        rol=rol,
+        clinica=clinica,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+    data = {
+        "token": invitacion.token,
+        "first_name": "N",
+        "last_name": "U",
+        "email": invitacion.email,
+        "password1": "short",
+        "password2": "short",
+        "telefono": "1234",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
+    }
+    url = reverse("invite-register")
+    response = client.post(url, data)
+
+    assert response.status_code == 400
+    assert "password1" in response.json()
+
+
+def test_invite_register_recaptcha_required(client, settings, monkeypatch):
+    rol, clinica = create_clinica_and_rol()
+    invitacion = InvitacionUsuario.objects.create(
+        email="bot@example.com",
+        token="tokcap",
+        rol=rol,
+        clinica=clinica,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+    settings.RECAPTCHA_REQUIRED = True
+    monkeypatch.setattr("core.api.serializers.verify_recaptcha", lambda t: False)
+    data = {
+        "token": invitacion.token,
+        "first_name": "B",
+        "last_name": "O",
+        "email": invitacion.email,
+        "password1": "Pass1234",
+        "password2": "Pass1234",
+        "telefono": "123",
+        "fecha_nacimiento": timezone.now().date(),
+        "genero": "M",
+        "recaptcha": "token",
+    }
+    url = reverse("invite-register")
+    response = client.post(url, data)
+
+    assert response.status_code == 400
+    assert "recaptcha" in response.json()
+
+
 def test_invite_register_invalid_token(client):
     data = {
         "token": "invalid",
         "first_name": "Bad",
         "last_name": "Guy",
         "email": "bad@example.com",
-        "password": "pass",
+        "password1": "Pass1234",
+        "password2": "Pass1234",
         "telefono": "1234567",
         "fecha_nacimiento": timezone.now().date(),
         "genero": "M",
@@ -160,7 +289,7 @@ def test_invite_with_nonexistent_role(client):
 def test_invite_to_other_clinic(client):
     rol, clinica = create_clinica_and_rol()
     other_clinic = Clinica.objects.create(
-        nombre="Otra", direccion="Dir", telefono="123", email="o@example.com"
+        nombre="Otra", direccion="Dir", telefono="123", email="o@example.com",
     )
     user = create_user_with_role_clinic(rol, clinica, email="user2@example.com")
     client.force_login(user)
@@ -179,7 +308,7 @@ def test_non_cca_invites_cca(client):
     rol_user = Rol.objects.create(nombre="dentista", descripcion="")
     rol_cca, _ = Rol.objects.get_or_create(nombre="CCA", defaults={"descripcion": ""})
     clinica = Clinica.objects.create(
-        nombre="Clinica1", direccion="Dir", telefono="123", email="c1@example.com"
+        nombre="Clinica1", direccion="Dir", telefono="123", email="c1@example.com",
     )
     user = create_user_with_role_clinic(rol_user, clinica, email="user3@example.com")
     client.force_login(user)
