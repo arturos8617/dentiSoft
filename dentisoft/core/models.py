@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 # 1. Rol
@@ -16,8 +17,26 @@ class Rol(models.Model):
 class Clinica(models.Model):
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
-    telefono = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def clean(self):
+        """Ensure required contact fields are not empty."""
+
+        errors = {}
+        if not self.telefono:
+            errors["telefono"] = "Este campo es obligatorio."
+        if not self.email:
+            errors["email"] = "Este campo es obligatorio."
+        if errors:
+            raise ValidationError(errors)
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
 
     def __str__(self):
         return self.nombre
