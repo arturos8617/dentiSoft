@@ -27,8 +27,8 @@ class Clinica(models.Model):
 class Paciente(models.Model):
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-    email = models.EmailField(blank=True)
-    fecha_nacimiento = models.DateField(null=True, blank=True)
+    email = models.EmailField()
+    fecha_nacimiento = models.DateField(null=True)
     es_provisional = models.BooleanField(default=True)
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
 
