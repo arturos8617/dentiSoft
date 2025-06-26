@@ -56,6 +56,8 @@ export default function NewInvitationPage() {
     gcTime: 30000,
   });
 
+  const roleOptions = rolesData ?? [];
+
   const {
     data: clinicasData,
     isLoading: clinicasLoading,
@@ -67,7 +69,7 @@ export default function NewInvitationPage() {
     gcTime: 30000,
   });
 
-  const clinicas = clinicasData ?? [];
+  const clinicOptions = clinicasData ?? [];
 
   const [email, setEmail] = useState('');
   const [rol, setRol] = useState<number | ''>('');
@@ -143,7 +145,7 @@ export default function NewInvitationPage() {
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona un rol...</option>
-                  {roles.map((r:Role) => (
+                  {roleOptions.map((r: Role) => (
                     <option key={r.id} value={r.id}>
                       {r.nombre}
                     </option>
@@ -159,7 +161,7 @@ export default function NewInvitationPage() {
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona una clínica...</option>
-                  {clinicas.map((c: Clinica) => (
+                  {clinicOptions.map((c: Clinica) => (
                     <option key={c.id} value={c.id}>
                       {c.nombre}
                     </option>
