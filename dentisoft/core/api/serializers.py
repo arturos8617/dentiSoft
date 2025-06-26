@@ -188,3 +188,15 @@ class InviteRegisterSerializer(serializers.Serializer):
             inv.estado = "usada"
             inv.save()
         return user
+    
+
+class RolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rol
+        fields = ["id", "nombre", "descripcion"]
+
+
+class ClinicaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Clinica
+        fields = ["id", "nombre", "direccion", "telefono", "email"]

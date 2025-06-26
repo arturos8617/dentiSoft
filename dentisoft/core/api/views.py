@@ -10,7 +10,8 @@ from rest_framework.views import APIView
 from core.api.permissions import CanInvitePermission
 from core.api.serializers import InvitacionUsuarioSerializer
 from core.api.serializers import InviteRegisterSerializer
-from core.models import InvitacionUsuario
+from core.api.serializers import RolSerializer, ClinicaSerializer
+from core.models import InvitacionUsuario, Rol, Clinica
 from core.tasks import enviar_invitacion_email
 
 logger = logging.getLogger(__name__)
@@ -55,3 +56,13 @@ class InviteRegisterAPIView(APIView):
             {"id": str(user.id), "email": user.email},
             status=status.HTTP_201_CREATED,
         )
+
+
+class RolViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Rol.objects.all()
+    serializer_class = RolSerializer
+
+
+class ClinicaViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Clinica.objects.all()
+    serializer_class = ClinicaSerializer
