@@ -6,22 +6,31 @@ import Button from '@/components/ui/Button';
 import FormField from '@/components/ui/FormField';
 import Card from '@/components/ui/Card';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
-// Fetch roles and clinicas
-const fetchRoles = async () => {
+interface Role {
+  id: number;
+  nombre: string;
+}
+
+interface Clinica {
+  id: number;
+  nombre: string;
+}
+
+const fetchRoles = async (): Promise<Role[]> => {
   const res = await fetch(`${API_BASE}/v1/roles/`);
   if (!res.ok) throw new Error('Error fetching roles');
-  return res.json() as Promise<{ id: number; nombre: string }[]>;
-};
-const fetchClinicas = async () => {
-  const res = await fetch(`${API_BASE}/v1/clinicas/`);
-  if (!res.ok) throw new Error('Error fetching clínicas');
-  return res.json() as Promise<{ id: number; nombre: string }[]>;
+  return res.json();
 };
 
-// Create invitation
-const createInvitation = async (payload: { email: string; rol: number; clinica: number }) => {
+const fetchClinicas = async (): Promise<Clinica[]> => {
+  const res = await fetch(`${API_BASE}/v1/clinicas/`);
+  if (!res.ok) throw new Error('Error fetching clínicas');
+  return res.json();
+};
+
+const createInvitation = async (payload: { email: string; rol: number; clinica: number }): Promise<any> => {
   const res = await fetch(`${API_BASE}/v1/invitaciones/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -36,24 +45,41 @@ const createInvitation = async (payload: { email: string; rol: number; clinica: 
 };
 
 export default function NewInvitationPage() {
-  const { data: roles, isLoading: rolesLoading, error: rolesError } = useQuery(['roles'], fetchRoles);
-  const { data: clinicas, isLoading: clinicasLoading, error: clinicasError } = useQuery(
-    ['clinicas'],
-    fetchClinicas
-  );
+  const {
+    data: roles = [],
+    isLoading: rolesLoading,
+    error: rolesError,
+  } = useQuery<Role[], Error>({
+    queryKey: ['roles'],
+    queryFn: fetchRoles,
+    staleTime: 5000,
+    cacheTime: 30000,
+  });
+
+  const {
+    data: clinicas = [],
+    isLoading: clinicasLoading,
+    error: clinicasError,
+  } = useQuery<Clinica[], Error>({
+    queryKey: ['clinicas'],
+    queryFn: fetchClinicas,
+    staleTime: 5000,
+    cacheTime: 30000,
+  });
 
   const [email, setEmail] = useState('');
-  const [rol, setRol] = useState('');
-  const [clinica, setClinica] = useState('');
+  const [rol, setRol] = useState<number | ''>('');
+  const [clinica, setClinica] = useState<number | ''>('');
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const mutation = useMutation(createInvitation, {
+  const mutation = useMutation<any, Error, { email: string; rol: number; clinica: number }>({
+    mutationFn: createInvitation,
     onSuccess: () => {
       setSuccess(true);
       setFormError(null);
     },
-    onError: (err: any) => {
+    onError: (err) => {
       setFormError(err.message);
       setSuccess(false);
     },
@@ -64,17 +90,12 @@ export default function NewInvitationPage() {
     setFormError(null);
     setSuccess(false);
 
-    // Basic validation
     if (!email || !rol || !clinica) {
       setFormError('Por favor completa todos los campos.');
       return;
     }
 
-    mutation.mutate({
-      email,
-      rol: parseInt(rol, 10),
-      clinica: parseInt(clinica, 10),
-    });
+    mutation.mutate({ email, rol: rol as number, clinica: clinica as number });
   };
 
   return (
@@ -116,11 +137,11 @@ export default function NewInvitationPage() {
                 <select
                   id="rol"
                   value={rol}
-                  onChange={(e) => setRol(e.target.value)}
+                  onChange={(e) => setRol(Number(e.target.value) || '')}
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona un rol...</option>
-                  {roles!.map((r) => (
+                  {roles.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.nombre}
                     </option>
@@ -132,11 +153,11 @@ export default function NewInvitationPage() {
                 <select
                   id="clinica"
                   value={clinica}
-                  onChange={(e) => setClinica(e.target.value)}
+                  onChange={(e) => setClinica(Number(e.target.value) || '')}
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona una clínica...</option>
-                  {clinicas!.map((c) => (
+                  {clinicas.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.nombre}
                     </option>
@@ -145,9 +166,17 @@ export default function NewInvitationPage() {
               </FormField>
 
               <div className="flex justify-end space-x-3 mt-6">
-                <Button variant="outline" type="button" onClick={() => {
-                  setEmail(''); setRol(''); setClinica(''); setFormError(null); setSuccess(false);
-                }}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => {
+                    setEmail('');
+                    setRol('');
+                    setClinica('');
+                    setFormError(null);
+                    setSuccess(false);
+                  }}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={mutation.isLoading}>
