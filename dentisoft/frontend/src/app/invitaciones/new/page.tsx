@@ -46,26 +46,28 @@ const createInvitation = async (payload: { email: string; rol: number; clinica: 
 
 export default function NewInvitationPage() {
   const {
-    data: roles = [],
+    data: rolesData,
     isLoading: rolesLoading,
     error: rolesError,
   } = useQuery<Role[], Error>({
     queryKey: ['roles'],
     queryFn: fetchRoles,
     staleTime: 5000,
-    cacheTime: 30000,
+    gcTime: 30000,
   });
 
   const {
-    data: clinicas = [],
+    data: clinicasData,
     isLoading: clinicasLoading,
     error: clinicasError,
   } = useQuery<Clinica[], Error>({
     queryKey: ['clinicas'],
     queryFn: fetchClinicas,
     staleTime: 5000,
-    cacheTime: 30000,
+    gcTime: 30000,
   });
+
+  const clinicas = clinicasData ?? [];
 
   const [email, setEmail] = useState('');
   const [rol, setRol] = useState<number | ''>('');
@@ -141,7 +143,7 @@ export default function NewInvitationPage() {
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona un rol...</option>
-                  {roles.map((r) => (
+                  {roles.map((r:Role) => (
                     <option key={r.id} value={r.id}>
                       {r.nombre}
                     </option>
@@ -157,7 +159,7 @@ export default function NewInvitationPage() {
                   className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
                 >
                   <option value="">Selecciona una clínica...</option>
-                  {clinicas.map((c) => (
+                  {clinicas.map((c: Clinica) => (
                     <option key={c.id} value={c.id}>
                       {c.nombre}
                     </option>
@@ -179,8 +181,8 @@ export default function NewInvitationPage() {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={mutation.isLoading}>
-                  {mutation.isLoading ? 'Enviando...' : 'Enviar invitación'}
+                <Button type="submit" disabled={mutation.isPending}>
+                  {mutation.isPending ? 'Enviando...' : 'Enviar invitación'}
                 </Button>
               </div>
             </form>
