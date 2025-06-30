@@ -5,14 +5,9 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import Button from '@/components/ui/Button';
 import FormField from '@/components/ui/FormField';
 import Card from '@/components/ui/Card';
+import { getCSRFToken } from '@/lib/csrf';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL as string;
-
-function getCSRFToken(): string {
-  if (typeof document === 'undefined') return '';
-  const match = document.cookie.match(/(?:csrftoken|__Secure-csrftoken)=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : '';
-}
 
 interface Option {
   id: number;

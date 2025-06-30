@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import Card from "@/components/ui/Card";
+import { getCSRFToken } from "@/lib/csrf";
 
 export default function AcceptInvitationPage() {
   const { token } = useParams();
@@ -46,12 +47,19 @@ export default function AcceptInvitationPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password1 !== form.password2) {
+      setMsg("Las contraseñas no coinciden.");
+      return;
+    }
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/invite-register/`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),
+          },
           body: JSON.stringify({ token, ...form }),
         }
       );
