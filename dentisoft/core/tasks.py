@@ -34,7 +34,7 @@ def enviar_invitacion_email(invitacion_id: str) -> bool:
         f"{invitacion.token}"
     )
     context = {
-        "domain": settings.SITE_DOMAIN,        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/invitaciones/accept/"
+        "domain": settings.SITE_DOMAIN,
         "invitation_url": invitation_url,
         "expiration_date": invitacion.fecha_expiracion,
     }
