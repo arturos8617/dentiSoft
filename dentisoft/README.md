@@ -115,4 +115,4 @@ See detailed [cookiecutter-django Docker documentation](https://cookiecutter-dja
 ### Invitaciones
 
 - Aceptar invitación: `/invitaciones/accept/[token]`
-- Crear invitación: `/invitaciones/new`
+- Crear invitación: `/invitaciones/new` (envía `POST /api/v1/invitaciones/`)

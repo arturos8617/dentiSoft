@@ -70,7 +70,7 @@ export default function AcceptInvitationPage() {
         </h1>
         <Card>
           {msg && <p className="mb-4 text-center">{msg}</p>}
-          <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <form onSubmit={onSubmit} className="space-y-4">
             <FormField label="Nombre" htmlFor="first_name">
               <input
                 id="first_name"

@@ -8,6 +8,12 @@ import Card from '@/components/ui/Card';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL as string;
 
+function getCSRFToken(): string {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(/(?:csrftoken|__Secure-csrftoken)=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
 interface Option {
   id: number;
   nombre: string;
@@ -34,13 +40,21 @@ const fetchClinicas = async (): Promise<Option[]> => {
 const createInvitation = async (payload: InvitationPayload) => {
   const res = await fetch(`${API_BASE}/v1/invitaciones/`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCSRFToken(),
+    },
     credentials: 'include',
     body: JSON.stringify(payload),
   });
   const data = await res.json();
   if (!res.ok) {
-    const message = data.detail || data.message || 'Error al crear invitación';
+    const message =
+      data.detail ||
+      data.message ||
+      (typeof data === 'object' && data !== null
+        ? Object.values(data).flat().join(' ')
+        : 'Error al crear invitación');
     throw new Error(message);
   }
   return data;
@@ -81,6 +95,10 @@ export default function NewInvitationPage() {
     e.preventDefault();
     setError(null);
     setSuccess(false);
+    if (!form.email || !form.rol || !form.clinica) {
+      setError('Completa todos los campos.');
+      return;
+    }
     mutation.mutate(form);
   };
 
@@ -111,7 +129,7 @@ export default function NewInvitationPage() {
               Invitación creada con éxito.
             </div>
           )}
-          <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <form onSubmit={onSubmit} className="space-y-4">
             <FormField label="Email" htmlFor="email">
               <input
                 id="email"
@@ -165,4 +183,3 @@ export default function NewInvitationPage() {
     </main>
   );
 }
-
