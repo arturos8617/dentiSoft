@@ -55,17 +55,24 @@ export default function AcceptInvitationPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const { data: invitation, isLoading, error } = useQuery<Invitation | null, Error>([
-    'invitation',
-    token
-  ], () => fetchInvitation(token), { enabled: !!token });
 
-  const mutation = useMutation<any, Error, RegisterPayload>(registerFromInvitation, {
+  const {
+    data: invitation,
+    isLoading,
+    error,
+  } = useQuery<Invitation | null, Error>({
+    queryKey: ['invitation', token],
+    queryFn: () => fetchInvitation(token),
+    enabled: !!token,
+  });
+
+  const mutation = useMutation<any, Error, RegisterPayload>({
+    mutationFn: registerFromInvitation,
     onSuccess: () => {
       setSuccess(true);
       setFormError(null);
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       setFormError(err.message);
       setSuccess(false);
     }
@@ -80,7 +87,7 @@ export default function AcceptInvitationPage() {
       setFormError('Por favor completa todos los campos.');
       return;
     }
-    mutation.mutate({ token, name, email: invitation.email, password });
+    mutation.mutate({ token, name, email: invitation!.email, password });
   };
 
   // Estados de carga o error inicial
@@ -128,7 +135,7 @@ export default function AcceptInvitationPage() {
               <input
                 id="email"
                 type="email"
-                value={invitation.email}
+                value={invitation!.email}
                 readOnly
                 className="w-full px-4 py-3 border border-neutral.300 rounded-md bg-neutral.lighter text-neutral.800"
               />
