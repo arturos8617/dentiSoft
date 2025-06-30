@@ -111,3 +111,8 @@ See detailed [cookiecutter-django Docker documentation](https://cookiecutter-dja
 - Run in dev: `cd frontend && npm run dev`
 - Environment: copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL`
 
+
+### Invitaciones
+
+- Aceptar invitación: `/invitaciones/accept/[token]`
+- Crear invitación: `/invitaciones/new`

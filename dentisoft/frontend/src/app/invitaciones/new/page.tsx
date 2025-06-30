@@ -1,40 +1,38 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Button from '@/components/ui/Button';
 import FormField from '@/components/ui/FormField';
 import Card from '@/components/ui/Card';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL as string;
-// El endpoint de registro de invitación no está bajo /v1
-const REGISTER_URL = API_BASE.replace(/\/api$/, '') + '/api/invite-register/';
 
-interface Invitation {
+interface Option {
   id: number;
+  nombre: string;
+}
+
+interface InvitationPayload {
   email: string;
   rol: number;
   clinica: number;
-  estado: string;
 }
 
-interface RegisterPayload {
-  token: string;
-  name: string;
-  email: string;
-  password: string;
-}
-
-const fetchInvitation = async (token: string): Promise<Invitation | null> => {
-  const res = await fetch(`${API_BASE}/v1/invitaciones/?token=${token}`, { credentials: 'include' });
-  if (!res.ok) throw new Error('Error fetching invitation');
-  const data = (await res.json()) as Invitation[];
-  return data.length > 0 ? data[0] : null;
+const fetchRoles = async (): Promise<Option[]> => {
+  const res = await fetch(`${API_BASE}/v1/roles/`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Error al cargar roles');
+  return res.json();
 };
 
-const registerFromInvitation = async (payload: RegisterPayload): Promise<any> => {
-  const res = await fetch(REGISTER_URL, {
+const fetchClinicas = async (): Promise<Option[]> => {
+  const res = await fetch(`${API_BASE}/v1/clinicas/`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Error al cargar clínicas');
+  return res.json();
+};
+
+const createInvitation = async (payload: InvitationPayload) => {
+  const res = await fetch(`${API_BASE}/v1/invitaciones/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -42,70 +40,55 @@ const registerFromInvitation = async (payload: RegisterPayload): Promise<any> =>
   });
   const data = await res.json();
   if (!res.ok) {
-    const message = data.detail || data.message || 'Error registering user';
+    const message = data.detail || data.message || 'Error al crear invitación';
     throw new Error(message);
   }
   return data;
 };
 
-export default function AcceptInvitationPage() {
-  const { token } = useParams() as { token: string };
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
+export default function NewInvitationPage() {
+  const { data: roles, isLoading: rolesLoading } = useQuery<Option[]>({
+    queryKey: ['roles'],
+    queryFn: fetchRoles,
+  });
+  const { data: clinicas, isLoading: clinicasLoading } = useQuery<Option[]>({
+    queryKey: ['clinicas'],
+    queryFn: fetchClinicas,
+  });
+
+  const [form, setForm] = useState<InvitationPayload>({
+    email: '',
+    rol: 0,
+    clinica: 0,
+  });
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-
-  const {
-    data: invitation,
-    isLoading,
-    error,
-  } = useQuery<Invitation | null, Error>({
-    queryKey: ['invitation', token],
-    queryFn: () => fetchInvitation(token),
-    enabled: !!token,
-  });
-
-  const mutation = useMutation<any, Error, RegisterPayload>({
-    mutationFn: registerFromInvitation,
+  const mutation = useMutation({
+    mutationFn: createInvitation,
     onSuccess: () => {
       setSuccess(true);
-      setFormError(null);
+      setError(null);
+      setForm({ email: '', rol: 0, clinica: 0 });
     },
     onError: (err: Error) => {
-      setFormError(err.message);
+      setError(err.message);
       setSuccess(false);
-    }
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError(null);
+    setError(null);
     setSuccess(false);
-
-    if (!invitation || !name || !password) {
-      setFormError('Por favor completa todos los campos.');
-      return;
-    }
-    mutation.mutate({ token, name, email: invitation!.email, password });
+    mutation.mutate(form);
   };
 
-  // Estados de carga o error inicial
-  if (isLoading) {
+  if (rolesLoading || clinicasLoading) {
     return (
       <main className="min-h-screen bg-neutral.bg py-8">
         <div className="max-w-2xl mx-auto px-4 md:px-6">
-          <p>Cargando invitación...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error || !invitation) {
-    return (
-      <main className="min-h-screen bg-neutral.bg py-8">
-        <div className="max-w-2xl mx-auto px-4 md:px-6">
-          <p className="text-error.DEFAULT text-center">Invitación inválida o expirada.</p>
+          <p>Cargando...</p>
         </div>
       </main>
     );
@@ -115,67 +98,65 @@ export default function AcceptInvitationPage() {
     <main className="min-h-screen bg-neutral.bg py-8">
       <div className="max-w-2xl mx-auto px-4 md:px-6">
         <h1 className="text-3xl font-semibold text-neutral.800 mb-6">
-          Completa tu registro
+          Nueva invitación
         </h1>
-
         <Card>
-          {formError && (
+          {error && (
             <div className="mb-4 text-sm text-error.DEFAULT" role="alert">
-              {formError}
+              {error}
             </div>
           )}
           {success && (
             <div className="mb-4 text-sm text-success.DEFAULT" role="status">
-              Registro completado con éxito.
+              Invitación creada con éxito.
             </div>
           )}
-
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={onSubmit} className="space-y-4" noValidate>
             <FormField label="Email" htmlFor="email">
               <input
                 id="email"
                 type="email"
-                value={invitation!.email}
-                readOnly
-                className="w-full px-4 py-3 border border-neutral.300 rounded-md bg-neutral.lighter text-neutral.800"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+                required
               />
             </FormField>
-
-            <FormField label="Nombre completo" htmlFor="name">
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
-              />
-            </FormField>
-
-            <FormField label="Contraseña" htmlFor="password">
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md focus:ring-2 focus:ring-primary.subtle"
-              />
-            </FormField>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => {
-                  setName('');
-                  setPassword('');
-                  setFormError(null);
-                  setSuccess(false);
-                }}
+            <FormField label="Rol" htmlFor="rol">
+              <select
+                id="rol"
+                value={form.rol || ''}
+                onChange={(e) => setForm({ ...form, rol: Number(e.target.value) })}
+                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+                required
               >
-                Cancelar
-              </Button>
+                <option value="">Selecciona</option>
+                {roles?.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.nombre}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <FormField label="Clínica" htmlFor="clinica">
+              <select
+                id="clinica"
+                value={form.clinica || ''}
+                onChange={(e) => setForm({ ...form, clinica: Number(e.target.value) })}
+                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+                required
+              >
+                <option value="">Selecciona</option>
+                {clinicas?.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <div className="flex justify-end mt-6">
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? 'Registrando...' : 'Registrar'}
+                {mutation.isPending ? 'Creando...' : 'Crear invitación'}
               </Button>
             </div>
           </form>
@@ -184,3 +165,4 @@ export default function AcceptInvitationPage() {
     </main>
   );
 }
+
