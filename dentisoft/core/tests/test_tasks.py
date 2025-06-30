@@ -53,7 +53,7 @@ def test_enviar_invitacion_email(settings, user):
     assert len(mail.outbox) == 1
     message = mail.outbox[0]
     url = (
-        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/api/invite-register/?token="
+        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/invitaciones/accept/"
         f"{invitacion.token}"
     )
     assert message.to == ["invitee@example.com"]

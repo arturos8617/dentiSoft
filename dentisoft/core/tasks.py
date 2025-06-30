@@ -30,11 +30,11 @@ def enviar_invitacion_email(invitacion_id: str) -> bool:
     """Send invitation email to the provided address."""
     invitacion = InvitacionUsuario.objects.get(id=invitacion_id)
     invitation_url = (
-        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/api/invite-register/?token="
+        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/invitaciones/accept/"
         f"{invitacion.token}"
     )
     context = {
-        "domain": settings.SITE_DOMAIN,
+        "domain": settings.SITE_DOMAIN,        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/invitaciones/accept/"
         "invitation_url": invitation_url,
         "expiration_date": invitacion.fecha_expiracion,
     }
