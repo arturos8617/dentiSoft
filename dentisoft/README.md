@@ -110,6 +110,7 @@ See detailed [cookiecutter-django Docker documentation](https://cookiecutter-dja
 - Folder: `frontend/`
 - Run in dev: `cd frontend && npm run dev`
 - Environment: copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL`
+- You may also set `DJANGO_FRONTEND_DOMAIN` in the Django environment to the frontend's domain (defaults to `DJANGO_SITE_DOMAIN`, e.g. `localhost:3000`).
 
 
 ### Invitaciones

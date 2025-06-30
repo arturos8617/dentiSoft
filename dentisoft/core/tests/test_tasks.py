@@ -15,6 +15,7 @@ pytestmark = pytest.mark.django_db
 def test_send_test_email(settings):
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.SITE_DOMAIN = "example.com"
+    settings.FRONTEND_DOMAIN = "example.com"    
     result = send_test_email.delay("test@example.com")
     assert isinstance(result, EagerResult)
     assert result.result is True
@@ -30,6 +31,7 @@ def test_send_test_email(settings):
 def test_enviar_invitacion_email(settings, user):
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.SITE_DOMAIN = "example.com"
+    settings.FRONTEND_DOMAIN = "example.com"    
 
     rol = Rol.objects.create(nombre="Rol", descripcion="")
     clinica = Clinica.objects.create(
@@ -53,7 +55,7 @@ def test_enviar_invitacion_email(settings, user):
     assert len(mail.outbox) == 1
     message = mail.outbox[0]
     url = (
-        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/invitaciones/accept/"
+        f"{settings.SITE_SCHEME}://{settings.FRONTEND_DOMAIN}/invitaciones/accept/"
         f"{invitacion.token}"
     )
     assert message.to == ["invitee@example.com"]
