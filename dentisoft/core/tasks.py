@@ -30,7 +30,7 @@ def enviar_invitacion_email(invitacion_id: str) -> bool:
     """Send invitation email to the provided address."""
     invitacion = InvitacionUsuario.objects.get(id=invitacion_id)
     invitation_url = (
-        f"https://{settings.SITE_DOMAIN}/api/invite-register/?token="
+        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/api/invite-register/?token="
         f"{invitacion.token}"
     )
     context = {

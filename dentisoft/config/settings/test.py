@@ -18,6 +18,8 @@ SECRET_KEY = env(
     default="FMf98tFc8zeXEGp4EWvDnbbSNuH98rfEkUNSyBIlzTjDRgRkpkarlhmEi5EmH1xW",
 )
 SITE_DOMAIN = env("DJANGO_SITE_DOMAIN", default="testserver")
+SITE_SCHEME = env("DJANGO_SITE_SCHEME", default="http")
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#test-runner
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 

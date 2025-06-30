@@ -1,11 +1,13 @@
 import pytest
 from celery.result import EagerResult
 from django.core import mail
-
 from django.utils import timezone
 
-from core.models import Clinica, InvitacionUsuario, Rol
-from core.tasks import enviar_invitacion_email, send_test_email
+from core.models import Clinica
+from core.models import InvitacionUsuario
+from core.models import Rol
+from core.tasks import enviar_invitacion_email
+from core.tasks import send_test_email
 
 pytestmark = pytest.mark.django_db
 
@@ -38,7 +40,7 @@ def test_enviar_invitacion_email(settings, user):
     )
     invitacion = InvitacionUsuario.objects.create(
         email="invitee@example.com",
-        token="token123",
+        token="token123",  # noqa: S106 - test token value
         rol=rol,
         clinica=clinica,
         invitado_por=user,
@@ -50,8 +52,10 @@ def test_enviar_invitacion_email(settings, user):
     assert result.result is True
     assert len(mail.outbox) == 1
     message = mail.outbox[0]
-    url = f"https://example.com/api/invite-register/?token={invitacion.token}"
+    url = (
+        f"{settings.SITE_SCHEME}://{settings.SITE_DOMAIN}/api/invite-register/?token="
+        f"{invitacion.token}"
+    )
     assert message.to == ["invitee@example.com"]
     assert url in message.body
     assert url in message.alternatives[0][0]
-
