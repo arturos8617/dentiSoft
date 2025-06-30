@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { getCSRFToken } from "@/lib/csrf";
 import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import Card from "@/components/ui/Card";
-import { getCSRFToken } from "@/lib/csrf";
 
 export default function AcceptInvitationPage() {
   const { token } = useParams();
@@ -60,6 +60,7 @@ export default function AcceptInvitationPage() {
             "Content-Type": "application/json",
             "X-CSRFToken": getCSRFToken(),
           },
+          credentials: "include",
           body: JSON.stringify({ token, ...form }),
         }
       );
