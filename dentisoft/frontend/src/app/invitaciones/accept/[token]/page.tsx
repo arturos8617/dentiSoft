@@ -67,10 +67,19 @@ export default function AcceptInvitationPage() {
           body: JSON.stringify({ token, ...form }),
         }
       );
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) {
+        const message =
+          data.detail ||
+          data.message ||
+          (typeof data === "object" && data !== null
+            ? Object.values(data).flat().join(" ")
+            : "Error en el registro.");
+        throw new Error(message);
+      }
       setMsg("Registro completado con éxito.");
-    } catch {
-      setMsg("Error en el registro.");
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Error en el registro.");
     }
   };
 
