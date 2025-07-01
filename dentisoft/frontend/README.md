@@ -36,14 +36,39 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Colores (HEX)
-Token	         Uso principal	                    Valor
-primary.DEFAULT	 Botones, enlaces, estados activos	#4773A1
-primary.light	 Hover / focus	                    #6A90B4
-primary.lighter	 Backgrounds, destacados suaves	    #8DADC7
-primary.subtle	 Bordes, input focus ring	        #B1CADA
-neutral.bg	     Fondos generales	                #FCFCFC
-neutral.800	     Texto principal	                #1F2937 (Tailwind gray-800)
-error.DEFAULT	 Mensajes de error	                #DC2626
-success.DEFAULT	 Mensajes de éxito	                #16A34A
-warning.DEFAULT	 Advertencias	                    #D97706
-info.DEFAULT	 Mensajes informativos	            #0EA5E9
+| Token             | Uso                                  | Valor HEX |
+| ----------------- | ------------------------------------ | --------- |
+| `primary.DEFAULT` | Botones principales, enlaces activos | `#4773A1` |
+| `primary.light`   | Hover / focus                        | `#6A90B4` |
+| `primary.lighter` | Fondos de estado, acentos suaves     | `#8DADC7` |
+| `primary.subtle`  | Borde de inputs, focus ring          | `#B1CADA` |
+| `neutral.bg`      | Fondo de página                      | `#FCFCFC` |
+| `neutral.lighter` | Fondos de cards read-only/empty      | `#F9FAFB` |
+| `neutral.800`     | Texto principal                      | `#1F2937` |
+| `error.DEFAULT`   | Errores (texto, íconos)              | `#DC2626` |
+| `success.DEFAULT` | Éxito (texto, íconos)                | `#16A34A` |
+| `warning.DEFAULT` | Advertencias                         | `#D97706` |
+| `info.DEFAULT`    | Mensajes informativos                | `#0EA5E9` |
+
+
+## Tipografía
+
+### Familias
+
+- **Cuerpo y UI:** `Inter`, `sans-serif`
+- **Títulos y branding:** `Rubik`, `sans-serif`
+
+### Escala de tamaños
+
+| Token | Tamaño     | Line-height |
+| ----- | ---------- | ----------- |
+| `sm`  | `0.875rem` | `1.25rem`   |
+| `base`| `1rem`     | `1.5rem`    |
+| `lg`  | `1.125rem` | `1.75rem`   |
+| `xl`  | `1.25rem`  | `1.75rem`   |
+| `2xl` | `1.5rem`   | `2rem`      |
+| `3xl` | `1.875rem` | `2.25rem`   |
+| `4xl` | `2.25rem`  | `2.5rem`    |
+
+Estas fuentes y tamaños también están configurados en `tailwind.config.js` y
+expuestos como variables CSS en `src/app/globals.css` para su uso directo.
