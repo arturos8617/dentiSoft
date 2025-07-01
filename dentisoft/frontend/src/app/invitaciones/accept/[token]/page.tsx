@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getCSRFToken } from "@/lib/csrf";
 import Button from "@/components/ui/Button";
-import FormField from "@/components/ui/FormField";
 import Card from "@/components/ui/Card";
 
 export default function AcceptInvitationPage() {
@@ -19,7 +18,10 @@ export default function AcceptInvitationPage() {
     password1: "",
     password2: "",
   });
-  const [msg, setMsg] = useState<string | null>(null);
+  const [message, setMessage] = useState<
+    | { text: string; type: "error" | "success" }
+    | null
+  >(null);
 
   useEffect(() => {
     if (!token) return;
@@ -51,7 +53,7 @@ export default function AcceptInvitationPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password1 !== form.password2) {
-      setMsg("Las contraseñas no coinciden.");
+      setMessage({ text: "Las contraseñas no coinciden.", type: "error" });
       return;
     }
     try {
@@ -77,119 +79,110 @@ export default function AcceptInvitationPage() {
             : "Error en el registro.");
         throw new Error(message);
       }
-      setMsg("Registro completado con éxito.");
+      setMessage({ text: "Registro completado con éxito.", type: "success" });
     } catch (err) {
-      setMsg(err instanceof Error ? err.message : "Error en el registro.");
+      setMessage({
+        text:
+          err instanceof Error ? err.message : "Error en el registro.",
+        type: "error",
+      });
     }
   };
 
   return (
-    <main className="min-h-screen bg-neutral.bg py-8">
-      <div className="max-w-xl mx-auto px-4 md:px-6">
-        <h1 className="text-3xl font-semibold text-neutral.800 mb-6">
+    <main className="min-h-screen bg-neutral-bg py-8 flex items-center justify-center">
+      <div className="w-full max-w-xl px-4 md:px-6">
+        <h1 className="text-3xl font-semibold text-neutral-800 mb-6">
           Completa tu registro
         </h1>
         <Card>
-          {msg && <p className="mb-4 text-center">{msg}</p>}
+          {message && (
+            <div
+              className={`mb-4 text-sm text-center ${
+                message.type === "error" ? "text-error" : "text-success"
+              }`}
+              role={message.type === "error" ? "alert" : "status"}
+            >
+              {message.text}
+            </div>
+          )}
           <form onSubmit={onSubmit} className="space-y-4">
-            <FormField label="Nombre" htmlFor="first_name">
-              <input
-                id="first_name"
-                type="text"
-                value={form.first_name}
-                onChange={(e) =>
-                  setForm({ ...form, first_name: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Apellidos" htmlFor="last_name">
-              <input
-                id="last_name"
-                type="text"
-                value={form.last_name}
-                onChange={(e) =>
-                  setForm({ ...form, last_name: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Correo" htmlFor="email">
-              <input
-                id="email"
-                type="email"
-                value={form.email}
-                readOnly
-                className="w-full px-4 py-3 border border-neutral.300 rounded-md bg-neutral.lighter text-neutral.800"
-              />
-            </FormField>
-            <FormField label="Teléfono" htmlFor="telefono">
-              <input
-                id="telefono"
-                type="text"
-                value={form.telefono}
-                onChange={(e) =>
-                  setForm({ ...form, telefono: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Fecha de nacimiento" htmlFor="fecha_nacimiento">
-              <input
-                id="fecha_nacimiento"
-                type="date"
-                value={form.fecha_nacimiento}
-                onChange={(e) =>
-                  setForm({ ...form, fecha_nacimiento: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Género" htmlFor="genero">
-              <select
-                id="genero"
-                value={form.genero}
-                onChange={(e) =>
-                  setForm({ ...form, genero: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              >
-                <option value="">Selecciona</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-                <option value="O">Otro</option>
-                <option value="N">Prefiero no decir</option>
-              </select>
-            </FormField>
-            <FormField label="Contraseña" htmlFor="password1">
-              <input
-                id="password1"
-                type="password"
-                value={form.password1}
-                onChange={(e) =>
-                  setForm({ ...form, password1: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Confirmar contraseña" htmlFor="password2">
-              <input
-                id="password2"
-                type="password"
-                value={form.password2}
-                onChange={(e) =>
-                  setForm({ ...form, password2: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
+            <input
+              id="first_name"
+              type="text"
+              placeholder="Nombre"
+              value={form.first_name}
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
+            <input
+              id="last_name"
+              type="text"
+              placeholder="Apellidos"
+              value={form.last_name}
+              onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
+            <input
+              id="email"
+              type="email"
+              value={form.email}
+              readOnly
+              className="w-full px-4 py-3 border border-neutral-300 rounded-md bg-neutral-lighter text-neutral-800"
+            />
+            <input
+              id="telefono"
+              type="text"
+              placeholder="Teléfono"
+              value={form.telefono}
+              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
+            <input
+              id="fecha_nacimiento"
+              type="date"
+              placeholder="Fecha de nacimiento"
+              value={form.fecha_nacimiento}
+              onChange={(e) =>
+                setForm({ ...form, fecha_nacimiento: e.target.value })
+              }
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
+            <select
+              id="genero"
+              value={form.genero}
+              onChange={(e) => setForm({ ...form, genero: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            >
+              <option value="">Selecciona género</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="O">Otro</option>
+              <option value="N">Prefiero no decir</option>
+            </select>
+            <input
+              id="password1"
+              type="password"
+              placeholder="Contraseña"
+              value={form.password1}
+              onChange={(e) => setForm({ ...form, password1: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
+            <input
+              id="password2"
+              type="password"
+              placeholder="Confirmar contraseña"
+              value={form.password2}
+              onChange={(e) => setForm({ ...form, password2: e.target.value })}
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
+              required
+            />
             <div className="flex justify-end mt-6">
               <Button type="submit">Registrarse</Button>
             </div>

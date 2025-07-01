@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Button from '@/components/ui/Button';
-import FormField from '@/components/ui/FormField';
 import Card from '@/components/ui/Card';
 import { getCSRFToken } from '@/lib/csrf';
 
@@ -70,28 +69,27 @@ export default function NewInvitationPage() {
     rol: 0,
     clinica: 0,
   });
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState<
+    | { text: string; type: "error" | "success" }
+    | null
+  >(null);
 
   const mutation = useMutation({
     mutationFn: createInvitation,
     onSuccess: () => {
-      setSuccess(true);
-      setError(null);
+      setMessage({ text: 'Invitación creada con éxito.', type: 'success' });
       setForm({ email: '', rol: 0, clinica: 0 });
     },
     onError: (err: Error) => {
-      setError(err.message);
-      setSuccess(false);
+      setMessage({ text: err.message, type: 'error' });
     },
   });
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(false);
+    setMessage(null);
     if (!form.email || !form.rol || !form.clinica) {
-      setError('Completa todos los campos.');
+      setMessage({ text: 'Completa todos los campos.', type: 'error' });
       return;
     }
     mutation.mutate(form);
@@ -99,8 +97,8 @@ export default function NewInvitationPage() {
 
   if (rolesLoading || clinicasLoading) {
     return (
-      <main className="min-h-screen bg-neutral.bg py-8">
-        <div className="max-w-2xl mx-auto px-4 md:px-6">
+      <main className="min-h-screen bg-neutral.bg py-8 flex items-center justify-center">
+        <div className="w-full max-w-2xl px-4 md:px-6">
           <p>Cargando...</p>
         </div>
       </main>
@@ -108,65 +106,61 @@ export default function NewInvitationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral.bg py-8">
-      <div className="max-w-2xl mx-auto px-4 md:px-6">
+    <main className="min-h-screen bg-neutral.bg py-8 flex items-center justify-center">
+      <div className="w-full max-w-2xl px-4 md:px-6">
         <h1 className="text-3xl font-semibold text-neutral.800 mb-6">
           Nueva invitación
         </h1>
         <Card>
-          {error && (
-            <div className="mb-4 text-sm text-error.DEFAULT" role="alert">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="mb-4 text-sm text-success.DEFAULT" role="status">
-              Invitación creada con éxito.
+        {message && (
+            <div
+              className={`mb-4 text-sm ${
+                message.type === 'error' ? 'text-error.DEFAULT' : 'text-success.DEFAULT'
+              }`}
+              role={message.type === 'error' ? 'alert' : 'status'}
+            >
+              {message.text}
             </div>
           )}
           <form onSubmit={onSubmit} className="space-y-4">
-            <FormField label="Email" htmlFor="email">
-              <input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              />
-            </FormField>
-            <FormField label="Rol" htmlFor="rol">
-              <select
-                id="rol"
-                value={form.rol || ''}
-                onChange={(e) => setForm({ ...form, rol: Number(e.target.value) })}
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              >
-                <option value="">Selecciona</option>
-                {roles?.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.nombre}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label="Clínica" htmlFor="clinica">
-              <select
-                id="clinica"
-                value={form.clinica || ''}
-                onChange={(e) => setForm({ ...form, clinica: Number(e.target.value) })}
-                className="w-full px-4 py-3 border border-primary.subtle rounded-md"
-                required
-              >
-                <option value="">Selecciona</option>
-                {clinicas?.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre}
-                  </option>
-                ))}
-              </select>
-            </FormField>
+          <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              required
+            />
+            <select
+              id="rol"
+              value={form.rol || ''}
+              onChange={(e) => setForm({ ...form, rol: Number(e.target.value) })}
+              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              required
+            >
+              <option value="">Selecciona rol</option>
+              {roles?.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.nombre}
+                </option>
+              ))}
+            </select>
+            <select
+              id="clinica"
+              value={form.clinica || ''}
+              onChange={(e) => setForm({ ...form, clinica: Number(e.target.value) })}
+              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              required
+            >
+              <option value="">Selecciona clínica</option>
+              {clinicas?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+
             <div className="flex justify-end mt-6">
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? 'Creando...' : 'Enviar invitación'}

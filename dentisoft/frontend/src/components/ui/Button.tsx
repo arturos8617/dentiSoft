@@ -17,9 +17,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  default: 'bg-primary.DEFAULT text-white hover:bg-primary.light',
-  outline: 'border border-neutral.300 text-neutral.800 bg-white hover:bg-neutral.lighter',
-  text: 'bg-transparent text-primary.DEFAULT hover:bg-primary.lighter',
+  default: 'bg-primary text-white hover:bg-primary-light',
+  outline: 'border border-neutral-300 text-neutral-800 bg-white hover:bg-neutral-lighter',
+  text: 'bg-transparent text-primary hover:bg-primary-lighter',
 };
 
 /**
@@ -35,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       className={clsx(
         'inline-flex items-center justify-center px-6 py-3 font-medium rounded-md',
-        'focus:outline-none focus:ring-2 focus:ring-primary.subtle',
+        'focus:outline-none focus:ring-2 focus:ring-primary-subtle',
         'transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
         variantStyles[variant],
         className
