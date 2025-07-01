@@ -363,3 +363,24 @@ def test_invite_duplicate_pending(client):
     assert response.status_code == 400
     assert "non_field_errors" in response.json()
 
+
+
+def test_get_invitation_by_token(client):
+    rol, clinica = create_clinica_and_rol()
+    invitacion = InvitacionUsuario.objects.create(
+        email="anon@example.com",
+        token="tokanon",
+        rol=rol,
+        clinica=clinica,
+        fecha_expiracion=timezone.now() + timezone.timedelta(days=1),
+    )
+    url = reverse("api:invitacionusuario-list")
+    response = client.get(url, {"token": invitacion.token})
+    assert response.status_code == 200
+    assert response.json()[0]["email"] == invitacion.email
+
+
+def test_get_invitation_invalid_token(client):
+    url = reverse("api:invitacionusuario-list")
+    response = client.get(url, {"token": "bad"})
+    assert response.status_code == 404
