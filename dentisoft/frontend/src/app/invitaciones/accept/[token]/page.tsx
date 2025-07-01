@@ -113,7 +113,6 @@ export default function AcceptInvitationPage() {
               placeholder="Nombre"
               value={form.first_name}
               onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <input
@@ -122,7 +121,6 @@ export default function AcceptInvitationPage() {
               placeholder="Apellidos"
               value={form.last_name}
               onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <input
@@ -138,7 +136,6 @@ export default function AcceptInvitationPage() {
               placeholder="Teléfono"
               value={form.telefono}
               onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <input
@@ -149,14 +146,12 @@ export default function AcceptInvitationPage() {
               onChange={(e) =>
                 setForm({ ...form, fecha_nacimiento: e.target.value })
               }
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <select
               id="genero"
               value={form.genero}
               onChange={(e) => setForm({ ...form, genero: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             >
               <option value="">Selecciona género</option>
@@ -171,7 +166,6 @@ export default function AcceptInvitationPage() {
               placeholder="Contraseña"
               value={form.password1}
               onChange={(e) => setForm({ ...form, password1: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <input
@@ -180,16 +174,10 @@ export default function AcceptInvitationPage() {
               placeholder="Confirmar contraseña"
               value={form.password2}
               onChange={(e) => setForm({ ...form, password2: e.target.value })}
-              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <div className="flex justify-end mt-6">
-            <Button
-                type="submit"
-                className="bg-primary text-white hover:bg-primary-light"
-              >
-                Registrarse
-              </Button>
+            <Button type="submit">Registrarse</Button>
             </div>
           </form>
         </Card>

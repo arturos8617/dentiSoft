@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Use color tokens from the design palette */
+  --background: #FCFCFC; /* neutral.bg */
+  --foreground: #1F2937; /* neutral.800 */
 }
 
 @theme inline {
@@ -25,4 +26,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+@layer base {
+  input,
+  select,
+  textarea {
+    @apply w-full px-4 py-3 border border-primary-subtle rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-light;
+  }
 }

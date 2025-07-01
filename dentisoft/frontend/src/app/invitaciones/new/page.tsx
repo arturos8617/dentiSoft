@@ -129,14 +129,12 @@ export default function NewInvitationPage() {
                 placeholder="Email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 border border-primary-subtle rounded-md"
                 required
               />
               <select
                 id="rol"
                 value={form.rol || ''}
                 onChange={(e) => setForm({ ...form, rol: Number(e.target.value) })}
-                className="w-full px-4 py-3 border border-primary-subtle rounded-md"
                 required
               >
                 <option value="">Selecciona rol</option>
@@ -150,7 +148,6 @@ export default function NewInvitationPage() {
                 id="clinica"
                 value={form.clinica || ''}
                 onChange={(e) => setForm({ ...form, clinica: Number(e.target.value) })}
-                className="w-full px-4 py-3 border border-primary-subtle rounded-md"
                 required
               >
                 <option value="">Selecciona clínica</option>
@@ -162,11 +159,7 @@ export default function NewInvitationPage() {
               </select>
   
               <div className="flex justify-end mt-6">
-                <Button
-                  type="submit"
-                  className="bg-primary text-white hover:bg-primary-light"
-                  disabled={mutation.isPending}
-                >
+              <Button type="submit" className="w-full" disabled={mutation.isPending}>
                   {mutation.isPending ? 'Creando...' : 'Enviar invitación'}
                 </Button>
               </div>
