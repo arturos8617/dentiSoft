@@ -97,7 +97,7 @@ export default function NewInvitationPage() {
 
   if (rolesLoading || clinicasLoading) {
     return (
-      <main className="min-h-screen bg-neutral.bg py-8 flex items-center justify-center">
+      <main className="min-h-screen bg-neutral-bg py-8 flex items-center justify-center">
         <div className="w-full max-w-2xl px-4 md:px-6">
           <p>Cargando...</p>
         </div>
@@ -106,16 +106,16 @@ export default function NewInvitationPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral.bg py-8 flex items-center justify-center">
+    <main className="min-h-screen bg-neutral-bg py-8 flex items-center justify-center">
       <div className="w-full max-w-2xl px-4 md:px-6">
         <h1 className="text-3xl font-semibold text-neutral.800 mb-6">
           Nueva invitación
         </h1>
         <Card>
-        {message && (
+          {message && (
             <div
               className={`mb-4 text-sm ${
-                message.type === 'error' ? 'text-error.DEFAULT' : 'text-success.DEFAULT'
+                message.type === 'error' ? 'text-error' : 'text-success'
               }`}
               role={message.type === 'error' ? 'alert' : 'status'}
             >
@@ -123,20 +123,20 @@ export default function NewInvitationPage() {
             </div>
           )}
           <form onSubmit={onSubmit} className="space-y-4">
-          <input
+            <input
               id="email"
               type="email"
               placeholder="Email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             />
             <select
               id="rol"
               value={form.rol || ''}
               onChange={(e) => setForm({ ...form, rol: Number(e.target.value) })}
-              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             >
               <option value="">Selecciona rol</option>
@@ -150,7 +150,7 @@ export default function NewInvitationPage() {
               id="clinica"
               value={form.clinica || ''}
               onChange={(e) => setForm({ ...form, clinica: Number(e.target.value) })}
-              className="w-full px-4 py-3 border border-primary.subtle rounded-md"
+              className="w-full px-4 py-3 border border-primary-subtle rounded-md"
               required
             >
               <option value="">Selecciona clínica</option>
