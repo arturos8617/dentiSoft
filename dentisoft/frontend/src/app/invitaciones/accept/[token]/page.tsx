@@ -191,7 +191,7 @@ export default function AcceptInvitationPage() {
               />
             </FormField>
             <div className="flex justify-end mt-6">
-              <Button type="submit">Registrar</Button>
+              <Button type="submit">Registrarse</Button>
             </div>
           </form>
         </Card>

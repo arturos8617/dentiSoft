@@ -169,7 +169,7 @@ export default function NewInvitationPage() {
             </FormField>
             <div className="flex justify-end mt-6">
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? 'Creando...' : 'Crear invitación'}
+                {mutation.isPending ? 'Creando...' : 'Enviar invitación'}
               </Button>
             </div>
           </form>
