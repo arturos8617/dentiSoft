@@ -164,7 +164,7 @@ export default function NewInvitationPage() {
               <div className="flex justify-end mt-6">
                 <Button
                   type="submit"
-                  className="bg-primary text-black hover:bg-primary-light"
+                  className="bg-primary text-white hover:bg-primary-light"
                   disabled={mutation.isPending}
                 >
                   {mutation.isPending ? 'Creando...' : 'Enviar invitación'}
