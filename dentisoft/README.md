@@ -123,4 +123,3 @@ See detailed [cookiecutter-django Docker documentation](https://cookiecutter-dja
 Para que el correo se envíe al crear una invitación debes tener en marcha
 un *worker* de Celery, ya que la tarea de envío se ejecuta de forma asíncrona. En el entorno local los mensajes no se mandan a la dirección real; se capturan en el servidor Mailpit disponible en
 `http://127.0.0.1:8025`.
-`http://127.0.0.1:8025`.

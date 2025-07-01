@@ -24,7 +24,10 @@ export default function AcceptInvitationPage() {
   useEffect(() => {
     if (!token) return;
     fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/invitaciones/?token=${token}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/invitaciones/?token=${token}`,
+      {
+        credentials: "include",
+      }
     )
       .then((res) => {
         if (!res.ok) throw new Error();
