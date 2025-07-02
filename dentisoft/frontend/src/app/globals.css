@@ -48,6 +48,18 @@
   --space-12: 48px;
   --space-16: 64px;
 
+  /* Border radius scale */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Box shadow scale */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.06);
+
   /* Global tokens */
   --background: var(--color-neutral-bg);
   --foreground: var(--color-neutral-800);
@@ -119,6 +131,9 @@ body {
   input,
   select,
   textarea {
-    @apply w-full px-4 py-3 border border-primary-subtle rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-light;
+    @apply w-full px-4 py-3 border border-primary-subtle focus:outline-none focus:ring-2 focus:ring-primary-light;
+    border-radius: var(--radius-md);
+    background-color: #fff;
+    box-shadow: var(--shadow-sm);
   }
 }
