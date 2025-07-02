@@ -127,3 +127,39 @@ Estos valores también provienen de `tailwind.config.js` y están expuestos como
 | `CheckCircleIcon` / `XCircleIcon` | Éxito / Error |
 
 Puedes importarlos directamente desde `src/components/ui/Icons.tsx`.
+
+
+
+## Global Layout Blueprint
+
+To maintain consistency across pages, a base layout component can be used. It leverages the design tokens defined in `globals.css`:
+
+```tsx
+import AppLayout from './src/components/AppLayout';
+
+<AppLayout title="Título pantalla">
+  {/* Page content here */}
+</AppLayout>
+```
+
+`AppLayout` renders the following structure:
+
+```html
+<div class="flex min-h-screen bg-[var(--color-neutral-bg)]">
+  <aside class="w-64 bg-[var(--color-neutral-lighter)] p-4 shadow-sm">
+    <!-- Sidebar items -->
+  </aside>
+  <div class="flex-1 flex flex-col">
+    <header class="h-16 bg-white shadow-sm flex items-center px-6">
+      <h1 class="text-2xl font-heading text-[var(--color-neutral-800)]">
+        Título pantalla
+      </h1>
+    </header>
+    <main class="flex-1 overflow-auto p-6">
+      <!-- Page content -->
+    </main>
+  </div>
+</div>
+```
+
+This blueprint ensures the sidebar, header and main content areas share the same styling tokens across the project.
