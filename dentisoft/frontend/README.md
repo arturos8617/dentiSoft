@@ -1,74 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-## Getting Started
+:root {
+  /* Color tokens from the design palette */
+  --color-primary: #4773A1;
+  --color-primary-light: #6A90B4;
+  --color-primary-lighter: #8DADC7;
+  --color-primary-subtle: #B1CADA;
 
-First, run the development server:
+  --color-neutral-bg: #FCFCFC;
+  --color-neutral-lighter: #F9FAFB;
+  --color-neutral-800: #1F2937;
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+  --color-error: #DC2626;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-info: #0EA5E9;
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  /* Typography tokens */
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Rubik', sans-serif;
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+  --fs-sm: 0.875rem;
+  --lh-sm: 1.25rem;
+  --fs-base: 1rem;
+  --lh-base: 1.5rem;
+  --fs-lg: 1.125rem;
+  --lh-lg: 1.75rem;
+  --fs-xl: 1.25rem;
+  --lh-xl: 1.75rem;
+  --fs-2xl: 1.5rem;
+  --lh-2xl: 2rem;
+  --fs-3xl: 1.875rem;
+  --lh-3xl: 2.25rem;
+  --fs-4xl: 2.25rem;
+  --lh-4xl: 2.5rem;
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
 
-## Learn More
+  /* Border radius scale */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
 
-To learn more about Next.js, take a look at the following resources:
+  /* Box shadow scale */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.06);
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  /* Global tokens */
+  --background: var(--color-neutral-bg);
+  --foreground: var(--color-neutral-800);
+}
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
 
-## Deploy on Vercel
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Colores (HEX)
-| Token             | Uso                                  | Valor HEX |
-| ----------------- | ------------------------------------ | --------- |
-| `primary.DEFAULT` | Botones principales, enlaces activos | `#4773A1` |
-| `primary.light`   | Hover / focus                        | `#6A90B4` |
-| `primary.lighter` | Fondos de estado, acentos suaves     | `#8DADC7` |
-| `primary.subtle`  | Borde de inputs, focus ring          | `#B1CADA` |
-| `neutral.bg`      | Fondo de página                      | `#FCFCFC` |
-| `neutral.lighter` | Fondos de cards read-only/empty      | `#F9FAFB` |
-| `neutral.800`     | Texto principal                      | `#1F2937` |
-| `error.DEFAULT`   | Errores (texto, íconos)              | `#DC2626` |
-| `success.DEFAULT` | Éxito (texto, íconos)                | `#16A34A` |
-| `warning.DEFAULT` | Advertencias                         | `#D97706` |
-| `info.DEFAULT`    | Mensajes informativos                | `#0EA5E9` |
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+}
 
 
-## Tipografía
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
 
-### Familias
+  h1 {
+    font-size: var(--fs-4xl);
+    line-height: var(--lh-4xl);
+  }
 
-- **Cuerpo y UI:** `Inter`, `sans-serif`
-- **Títulos y branding:** `Rubik`, `sans-serif`
+  h2 {
+    font-size: var(--fs-3xl);
+    line-height: var(--lh-3xl);
+  }
 
-### Escala de tamaños
+  h3 {
+    font-size: var(--fs-2xl);
+    line-height: var(--lh-2xl);
+  }
 
-| Token | Tamaño     | Line-height |
-| ----- | ---------- | ----------- |
-| `sm`  | `0.875rem` | `1.25rem`   |
-| `base`| `1rem`     | `1.5rem`    |
-| `lg`  | `1.125rem` | `1.75rem`   |
-| `xl`  | `1.25rem`  | `1.75rem`   |
-| `2xl` | `1.5rem`   | `2rem`      |
-| `3xl` | `1.875rem` | `2.25rem`   |
-| `4xl` | `2.25rem`  | `2.5rem`    |
+  h4 {
+    font-size: var(--fs-xl);
+    line-height: var(--lh-xl);
+  }
 
-Estas fuentes y tamaños también están configurados en `tailwind.config.js` y
-expuestos como variables CSS en `src/app/globals.css` para su uso directo.
+  h5 {
+    font-size: var(--fs-lg);
+    line-height: var(--lh-lg);
+  }
+
+  h6 {
+    font-size: var(--fs-base);
+    line-height: var(--lh-base);
+  }
+
+  input,
+  select,
+  textarea {
+    @apply w-full px-4 py-3 border border-primary-subtle focus:outline-none focus:ring-2 focus:ring-primary-light;
+    border-radius: var(--radius-md);
+    background-color: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+}
