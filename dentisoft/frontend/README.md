@@ -107,10 +107,23 @@ Estos valores están definidos en `tailwind.config.js` y disponibles como variab
 ### Box-Shadow
 
 | Token | Valor | Uso típico |
-| ----- | ----- | ---------- |
-| `sm` | `0 1px 2px rgba(0,0,0,0.05)` | Encabezados, inputs |
-| `md` | `0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06)` | Cards |
-| `lg` | `0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)` | Modales y overlays |
-| `inner` | `inset 0 2px 4px rgba(0,0,0,0.06)` | Inputs enfocados internamente |
+| ----- | -------------------------------------------------------- | ------------------- |
+| `sm` | `0 1px 2px rgba(0,0,0,0.05)`                              | Encabezados, inputs |
+| `md` | `0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06)`   | Cards               |
+| `lg` | `0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)` | Modales y overlays  |
+| `inner` | `inset 0 2px 4px rgba(0,0,0,0.06)`                     | Inputs enfocados internamente |
 
 Estos valores también provienen de `tailwind.config.js` y están expuestos como variables CSS en `src/app/globals.css`.
+
+### Íconos clave
+
+| Componente | Uso |
+| ---------- | --------------------------------------------------- |
+| `UserPlusIcon` | Invitar usuarios |
+| `EnvelopeIcon` | Correo |
+| `CalendarIcon` | Fecha |
+| `PhoneIcon` | Teléfono |
+| `LockClosedIcon` | Contraseña |
+| `CheckCircleIcon` / `XCircleIcon` | Éxito / Error |
+
+Puedes importarlos directamente desde `src/components/ui/Icons.tsx`.
