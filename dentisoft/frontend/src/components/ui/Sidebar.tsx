@@ -1,17 +1,5 @@
-// src/components/Sidebar.tsx
 import Link from "next/link";
-
-interface MenuItem {
-  label: string;
-  href: string;
-  roles?: string[];            // empty or undefined -> visible to all
-}
-
-const menuItems: MenuItem[] = [
-  { label: "Agenda", href: "/agenda", roles: ["dentista", "CCA"] },
-  { label: "Pacientes", href: "/pacientes", roles: ["dentista"] },
-  { label: "Invitaciones", href: "/invitaciones/new", roles: ["CCA"] },
-];
+import { menuItems } from "@/navigation/menu";
 
 export default function Sidebar({ role }: { role?: string }) {
   const allowed = menuItems.filter(

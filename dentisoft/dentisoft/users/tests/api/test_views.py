@@ -32,4 +32,5 @@ class TestUserViewSet:
             "url": f"http://testserver/api/users/{user.pk}/",
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "rol": user.rol.nombre,
         }
