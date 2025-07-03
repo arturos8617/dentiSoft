@@ -17,7 +17,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ title, children }) => {
         {/* Sidebar items */}
       </aside>
       <div className="flex-1 flex flex-col">
-        <header className="h-16 bg-[var(--color-neutral-lighter) shadow-sm flex items-center px-6">
+        <header className="h-16 bg-[var(--color-neutral-lighter)] shadow-sm flex items-center px-6">
           <h1 className="text-2xl font-heading text-[var(--color-neutral-800)]">
             {title}
           </h1>
