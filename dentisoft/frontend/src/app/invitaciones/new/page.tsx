@@ -107,11 +107,14 @@ export default function NewInvitationPage() {
     
     return (
       <AppLayout title="Nueva invitación">
-        <div className="max-w-xl mx-auto">
+        <div className="mx-auto max-w-xl p-[var(--space-6)]">
           <Card>
+            <h2 className="mb-4 text-xl font-heading text-[var(--color-neutral-800)]">
+              Invitar usuario
+            </h2>
             {message && (
               <div
-                className={`mb-4 text-sm ${
+                className={`mb-4 text-sm font-medium ${
                   message.type === 'error'
                     ? 'text-[var(--color-error)]'
                     : 'text-[var(--color-success)]'
@@ -121,7 +124,7 @@ export default function NewInvitationPage() {
                 {message.text}
               </div>
             )}
-            <form onSubmit={onSubmit} className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-[var(--space-4)]">
               <FormField label="Email" htmlFor="email">
                 <input
                   id="email"
@@ -162,7 +165,7 @@ export default function NewInvitationPage() {
                 </select>
               </FormField>
   
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-[var(--space-6)]">
                 <Button type="submit" className="w-full" disabled={mutation.isPending}>
                   {mutation.isPending ? 'Creando...' : 'Enviar invitación'}
                 </Button>
