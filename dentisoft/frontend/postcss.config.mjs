@@ -6,8 +6,5 @@ import autoprefixer from 'autoprefixer';
  * Uses the new `@tailwindcss/postcss` plugin so builds succeed.
  */
 export default {
-  plugins: {
-    tailwindcss,
-    autoprefixer,
-  },
+  plugins: [tailwindcss, autoprefixer],
 };
