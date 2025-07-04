@@ -1,4 +1,4 @@
-import tailwind from '@tailwindcss/postcss';
+import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 
 /**
@@ -6,5 +6,8 @@ import autoprefixer from 'autoprefixer';
  * Uses the new `@tailwindcss/postcss` plugin so builds succeed.
  */
 export default {
-  plugins: [tailwind(), autoprefixer()],
+  plugins: {
+    tailwindcss: tailwindcss(),
+    autoprefixer: autoprefixer(),
+  },
 };
