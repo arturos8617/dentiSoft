@@ -1,6 +1,8 @@
+@reference "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 :root {
   /* Color tokens from the design palette */
@@ -131,10 +133,9 @@ body {
   input,
   select,
   textarea {
-    @apply w-full border focus:outline-none focus:ring-2 px-4 ;
+    @apply w-full border focus:outline-none focus:ring-2 px-4 py-3 ;
     border-radius: var(--radius-md);
     background-color: #fff;
     box-shadow: var(--shadow-sm);
   }
 }
-  /* focus:ring-primary-light border-primary-subtle py-3 px-4 */
