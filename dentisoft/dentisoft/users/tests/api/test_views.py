@@ -25,12 +25,20 @@ class TestUserViewSet:
         request.user = user
 
         view.request = request
+        view.action = "me"
+        view.format_kwarg = None
 
         response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
 
         assert response.data == {
-            "url": f"http://testserver/api/v1/users/{user.pk}/",
+            "id": user.id,
+            "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "rol": user.rol.nombre,
+            "telefono": user.telefono,
+            "fecha_nacimiento": user.fecha_nacimiento.isoformat(),
+            "genero": user.genero,
+            "rol": user.rol.id,
+            "clinica": user.clinica.id,
+            "activo": user.activo,
         }
