@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 # 1. Rol
@@ -16,8 +17,26 @@ class Rol(models.Model):
 class Clinica(models.Model):
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
-    telefono = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def clean(self):
+        """Ensure required contact fields are not empty."""
+
+        errors = {}
+        if not self.telefono:
+            errors["telefono"] = "Este campo es obligatorio."
+        if not self.email:
+            errors["email"] = "Este campo es obligatorio."
+        if errors:
+            raise ValidationError(errors)
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
 
     def __str__(self):
         return self.nombre
@@ -27,8 +46,8 @@ class Clinica(models.Model):
 class Paciente(models.Model):
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-    email = models.EmailField(blank=True)
-    fecha_nacimiento = models.DateField(null=True, blank=True)
+    email = models.EmailField()
+    fecha_nacimiento = models.DateField(null=True)
     es_provisional = models.BooleanField(default=True)
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
 
@@ -115,6 +134,7 @@ class InvitacionUsuario(models.Model):
         related_name="invitaciones_creadas",
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    ip_creacion = models.GenericIPAddressField(null=True, blank=True)
     fecha_expiracion = models.DateTimeField()
     ESTADOS = [
         ("pendiente", "Pendiente"),

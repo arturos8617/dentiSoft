@@ -110,4 +110,16 @@ See detailed [cookiecutter-django Docker documentation](https://cookiecutter-dja
 - Folder: `frontend/`
 - Run in dev: `cd frontend && npm run dev`
 - Environment: copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_API_BASE_URL`
+- You may also set `DJANGO_FRONTEND_DOMAIN` in the Django environment to the frontend's domain (defaults to `DJANGO_SITE_DOMAIN`, e.g. `localhost:3000`).
 
+
+### Invitaciones
+
+- Aceptar invitación: `/invitaciones/accept/[token]`
+- Crear invitación: `/invitaciones/new` (envía `POST /api/v1/invitaciones/`)
+- Validar invitación: `GET /api/v1/invitaciones/?token=<token>`
+
+### Correo
+Para que el correo se envíe al crear una invitación debes tener en marcha
+un *worker* de Celery, ya que la tarea de envío se ejecuta de forma asíncrona. En el entorno local los mensajes no se mandan a la dirección real; se capturan en el servidor Mailpit disponible en
+`http://127.0.0.1:8025`.

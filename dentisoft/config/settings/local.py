@@ -16,6 +16,13 @@ SECRET_KEY = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
 SITE_DOMAIN = env("DJANGO_SITE_DOMAIN", default="localhost:8000")
+SITE_SCHEME = env("DJANGO_SITE_SCHEME", default="http")
+FRONTEND_DOMAIN = env("DJANGO_FRONTEND_DOMAIN", default="localhost:3000")
+
+# Frontend dev server origins
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 # CACHES
 # ------------------------------------------------------------------------------

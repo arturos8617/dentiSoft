@@ -1,23 +1,54 @@
 from collections.abc import Sequence
 from typing import Any
 
-from factory import Faker
+from factory import Faker as FactoryFaker, SubFactory, LazyFunction
 from factory import post_generation
 from factory.django import DjangoModelFactory
-
+from core.models import Clinica, Rol
 from dentisoft.users.models import User
+
+class RolFactory(DjangoModelFactory[Rol]):
+    nombre = "dentista"
+    descripcion = FactoryFaker("sentence")
+
+    class Meta:
+        model = Rol
+        django_get_or_create = ["nombre"]
+
+
+def _short_phone() -> str:
+    """Generate a phone number trimmed to the DB field length."""
+    return FactoryFaker("phone_number").evaluate(None, None, extra={"locale": None})[:20]
+
+
+class ClinicaFactory(DjangoModelFactory[Clinica]):
+    nombre = FactoryFaker("company")
+    direccion = FactoryFaker("street_address")
+    telefono = LazyFunction(_short_phone)
+    email = FactoryFaker("company_email")
+
+    class Meta:
+        model = Clinica
+        django_get_or_create = ["nombre"]
+
 
 
 class UserFactory(DjangoModelFactory[User]):
-    email = Faker("email")
-    name = Faker("name")
+    email = FactoryFaker("email")
+    first_name = FactoryFaker("first_name")
+    last_name = FactoryFaker("last_name")
+    telefono = LazyFunction(_short_phone)
+    fecha_nacimiento = FactoryFaker("date_of_birth")
+    genero = FactoryFaker("random_element", elements=["M", "F", "O", "N"])
+    rol = SubFactory(RolFactory)
+    clinica = SubFactory(ClinicaFactory)
 
     @post_generation
     def password(self, create: bool, extracted: Sequence[Any], **kwargs):  # noqa: FBT001
         password = (
             extracted
             if extracted
-            else Faker(
+            else FactoryFaker(
                 "password",
                 length=42,
                 special_chars=True,

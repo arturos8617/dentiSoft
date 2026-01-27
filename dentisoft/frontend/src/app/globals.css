@@ -1,14 +1,76 @@
-@import "tailwindcss";
+@reference "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color tokens from the design palette */
+  --color-primary: #4773A1;
+  --color-primary-light: #6A90B4;
+  --color-primary-lighter: #8DADC7;
+  --color-primary-subtle: #B1CADA;
+
+  --color-neutral-bg: #FCFCFC;
+  --color-neutral-lighter: #F9FAFB;
+  --color-neutral-800: #1F2937;
+
+  --color-error: #DC2626;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-info: #0EA5E9;
+
+  /* Typography tokens */
+  --font-body: var(--font-inter, 'Inter, sans-serif');
+  --font-heading: var(--font-rubik, 'Rubik, sans-serif');
+
+  --fs-sm: 0.875rem;
+  --lh-sm: 1.25rem;
+  --fs-base: 1rem;
+  --lh-base: 1.5rem;
+  --fs-lg: 1.125rem;
+  --lh-lg: 1.75rem;
+  --fs-xl: 1.25rem;
+  --lh-xl: 1.75rem;
+  --fs-2xl: 1.5rem;
+  --lh-2xl: 2rem;
+  --fs-3xl: 1.875rem;
+  --lh-3xl: 2.25rem;
+  --fs-4xl: 2.25rem;
+  --lh-4xl: 2.5rem;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border radius scale */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Box shadow scale */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.06);
+
+  /* Global tokens */
+  --background: var(--color-neutral-bg);
+  --foreground: var(--color-neutral-800);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -22,5 +84,58 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+}
+
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+
+  h1 {
+    font-size: var(--fs-4xl);
+    line-height: var(--lh-4xl);
+  }
+
+  h2 {
+    font-size: var(--fs-3xl);
+    line-height: var(--lh-3xl);
+  }
+
+  h3 {
+    font-size: var(--fs-2xl);
+    line-height: var(--lh-2xl);
+  }
+
+  h4 {
+    font-size: var(--fs-xl);
+    line-height: var(--lh-xl);
+  }
+
+  h5 {
+    font-size: var(--fs-lg);
+    line-height: var(--lh-lg);
+  }
+
+  h6 {
+    font-size: var(--fs-base);
+    line-height: var(--lh-base);
+  }
+
+  input,
+  select,
+  textarea {
+    @apply w-full border focus:outline-none focus:ring-2 px-4 py-3 ;
+    border-radius: var(--radius-md);
+    background-color: #fff;
+    box-shadow: var(--shadow-sm);
+  }
 }
